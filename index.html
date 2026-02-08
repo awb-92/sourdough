@@ -65,6 +65,16 @@
             margin: -16px -16px 16px -16px; /* Extend to edges on mobile */
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
             z-index: 100;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .timer-banner:active {
+            transform: scale(0.98);
+        }
+
+        .timer-banner .banner-content {
+            pointer-events: none;
         }
 
         @media (min-width: 768px) {
@@ -369,11 +379,18 @@
             background: #0f0f0f;
             color: #e0e0e0;
             min-height: 48px;
+            /* Allow past dates */
         }
 
         .form-group input[type="datetime-local"]:focus {
             outline: none;
             border-color: #667eea;
+        }
+
+        .form-group .hint {
+            font-size: 0.85em;
+            color: #a0a0a0;
+            margin-top: 6px;
         }
 
         /* Options Section */
@@ -434,6 +451,44 @@
             height: 20px;
             cursor: pointer;
             accent-color: #667eea;
+        }
+
+        /* Step Selector */
+        .step-selector {
+            margin: 20px 0;
+            padding: 16px;
+            background: #0f0f0f;
+            border-radius: 8px;
+            border: 1px solid #2a2a2a;
+        }
+
+        .step-selector h4 {
+            color: #e0e0e0;
+            margin-bottom: 12px;
+            font-size: 1em;
+        }
+
+        .step-selector select {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 2px solid #2a2a2a;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 1em;
+            min-height: 48px;
+            cursor: pointer;
+        }
+
+        .step-selector select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .step-selector .hint {
+            font-size: 0.85em;
+            color: #a0a0a0;
+            margin-top: 6px;
         }
 
         /* Ingredients Checklist */
@@ -734,12 +789,14 @@
             <button class="btn btn-secondary" onclick="app.requestNotificationPermission()">Enable Notifications</button>
         </div>
 
-        <!-- Active Timer Banner (shown when viewing a bake) -->
+        <!-- Active Timer Banner (shown when there are active bakes) -->
         <div id="timerBanner" class="timer-banner hidden">
-            <h2 id="bannerRecipeName"></h2>
-            <div class="current-step" id="bannerCurrentStep"></div>
-            <div class="time-remaining" id="bannerTimeRemaining"></div>
-            <div class="next-step" id="bannerNextStep"></div>
+            <div class="banner-content" onclick="app.showTimelineView(app.getNextActiveBakeId())">
+                <h2 id="bannerRecipeName"></h2>
+                <div class="current-step" id="bannerCurrentStep"></div>
+                <div class="time-remaining" id="bannerTimeRemaining"></div>
+                <div class="next-step" id="bannerNextStep"></div>
+            </div>
         </div>
 
         <!-- Main Screen -->
@@ -783,11 +840,21 @@
                 <div class="form-group" id="startTimeGroup">
                     <label for="startTime">Start Time:</label>
                     <input type="datetime-local" id="startTime">
+                    <div class="hint">Can be in the past if you've already started</div>
                 </div>
 
                 <div class="form-group hidden" id="endTimeGroup">
                     <label for="endTime">When do you want to slice/eat?</label>
                     <input type="datetime-local" id="endTime">
+                </div>
+
+                <!-- Starting Step Selector -->
+                <div class="step-selector">
+                    <h4>Starting from which step?</h4>
+                    <select id="startingStep">
+                        <option value="0">Beginning (Step 1)</option>
+                    </select>
+                    <div class="hint">Choose where you are in the process</div>
                 </div>
 
                 <!-- Recipe Options -->
@@ -1205,10 +1272,19 @@
                 localStorage.setItem('activeBakes', JSON.stringify(this.activeBakes));
             },
 
+            populateStartingSteps() {
+                const recipe = RECIPES[this.selectedRecipe];
+                const select = document.getElementById('startingStep');
+                
+                select.innerHTML = recipe.steps.map((step, index) => {
+                    return `<option value="${index}">${index === 0 ? 'Beginning: ' : 'Skip to: '}${step.name}</option>`;
+                }).join('');
+            },
+
             showMainScreen() {
                 this.hideAllScreens();
                 document.getElementById('mainScreen').classList.remove('hidden');
-                document.getElementById('timerBanner').classList.add('hidden');
+                this.updateGlobalTimerBanner();
                 this.currentScreen = 'main';
             },
 
@@ -1216,6 +1292,7 @@
                 this.hideAllScreens();
                 document.getElementById('recipeSelection').classList.remove('hidden');
                 this.renderRecipeGrid();
+                this.updateGlobalTimerBanner();
                 this.currentScreen = 'recipeSelection';
             },
 
@@ -1225,6 +1302,8 @@
                 document.getElementById('timelineSetup').classList.remove('hidden');
                 document.getElementById('setupRecipeName').textContent = RECIPES[recipeKey].name;
                 this.renderRecipeOptions();
+                this.populateStartingSteps();
+                this.updateGlobalTimerBanner();
                 this.currentScreen = 'timelineSetup';
             },
 
@@ -1235,7 +1314,6 @@
                 if (!bake) return;
 
                 document.getElementById('timelineView').classList.remove('hidden');
-                document.getElementById('timerBanner').classList.remove('hidden');
                 document.getElementById('timelineRecipeName').textContent = bake.recipeName;
                 
                 const startTime = new Date(bake.steps[0].time).toLocaleString();
@@ -1244,7 +1322,7 @@
 
                 this.renderIngredients(bake);
                 this.renderTimelineSteps(bake);
-                this.updateTimerBanner(bake);
+                this.updateGlobalTimerBanner();
                 this.currentScreen = 'timelineView';
             },
 
@@ -1277,6 +1355,8 @@
                         </div>
                     `;
                 }).join('');
+                
+                this.updateGlobalTimerBanner();
             },
 
             renderRecipeGrid() {
@@ -1349,6 +1429,7 @@
 
             calculateTimeline() {
                 const recipe = RECIPES[this.selectedRecipe];
+                const startingStepIndex = parseInt(document.getElementById('startingStep').value);
                 let startTime;
 
                 if (this.mode === 'forward') {
@@ -1356,7 +1437,7 @@
                 } else {
                     // Backward mode - calculate from end time
                     const endTime = new Date(document.getElementById('endTime').value);
-                    const totalDuration = this.calculateTotalDuration(recipe);
+                    const totalDuration = this.calculateTotalDuration(recipe, startingStepIndex);
                     startTime = new Date(endTime - totalDuration);
                 }
 
@@ -1380,12 +1461,16 @@
                     selectedOptions,
                     ingredientsChecked: {},
                     steps: [],
-                    currentStepIndex: 0
+                    currentStepIndex: 0,
+                    startingStepIndex
                 };
 
-                // Calculate step times
+                // Calculate step times starting from selected step
                 let currentTime = new Date(startTime);
                 recipe.steps.forEach((step, index) => {
+                    // Mark previous steps as completed if starting mid-process
+                    const isCompleted = index < startingStepIndex;
+                    
                     let duration;
                     
                     if (step.options) {
@@ -1399,9 +1484,10 @@
                             duration,
                             unit: option.unit || step.unit,
                             guidance: step.guidance,
-                            completed: false,
+                            completed: isCompleted,
                             selectedOption: option.name,
-                            branch: option.branch
+                            branch: option.branch,
+                            stepIndex: index
                         });
                     } else {
                         // Handle duration ranges
@@ -1417,7 +1503,8 @@
                             duration,
                             unit: step.unit,
                             guidance: step.guidance,
-                            completed: false
+                            completed: isCompleted,
+                            stepIndex: index
                         });
                     }
 
@@ -1434,9 +1521,12 @@
                 this.showTimelineView(bake.id);
             },
 
-            calculateTotalDuration(recipe) {
+            calculateTotalDuration(recipe, startingStepIndex = 0) {
                 let total = 0;
                 recipe.steps.forEach((step, index) => {
+                    // Skip steps before the starting step
+                    if (index < startingStepIndex) return;
+                    
                     let duration;
                     
                     if (step.options) {
@@ -1545,6 +1635,11 @@
                                     <button class="btn btn-success" onclick="app.completeStep('${bake.id}', ${index})">
                                         Mark Complete
                                     </button>
+                                    ${step.name.includes('fermentation') || step.name.includes('proof') ? `
+                                        <button class="btn btn-secondary" onclick="app.adjustStepOptions('${bake.id}', ${index})">
+                                            Adjust Options
+                                        </button>
+                                    ` : ''}
                                 </div>
                             ` : ''}
                         </div>
@@ -1573,7 +1668,7 @@
                 bake.currentStepIndex = stepIndex + 1;
                 this.saveActiveBakes();
                 this.renderTimelineSteps(bake);
-                this.updateTimerBanner(bake);
+                this.updateGlobalTimerBanner();
             },
 
             getCurrentStep(bake) {
@@ -1596,19 +1691,46 @@
                 return bake.steps.length - 1;
             },
 
-            updateTimerBanner(bake) {
-                if (!bake) return;
+            updateGlobalTimerBanner() {
+                // Show banner if there are any active bakes
+                if (this.activeBakes.length === 0) {
+                    document.getElementById('timerBanner').classList.add('hidden');
+                    return;
+                }
 
-                const currentStepIndex = this.getCurrentStepIndex(bake);
-                const currentStep = bake.steps[currentStepIndex];
+                // Find the most urgent active bake (closest upcoming step)
+                let mostUrgentBake = null;
+                let shortestTimeRemaining = Infinity;
                 const now = new Date();
-                const timeRemaining = currentStep.time - now;
 
-                document.getElementById('bannerRecipeName').textContent = bake.recipeName;
+                this.activeBakes.forEach(bake => {
+                    const currentStepIndex = this.getCurrentStepIndex(bake);
+                    const currentStep = bake.steps[currentStepIndex];
+                    
+                    if (!currentStep.completed) {
+                        const timeRemaining = currentStep.time - now;
+                        if (timeRemaining < shortestTimeRemaining) {
+                            shortestTimeRemaining = timeRemaining;
+                            mostUrgentBake = bake;
+                        }
+                    }
+                });
+
+                if (!mostUrgentBake) {
+                    document.getElementById('timerBanner').classList.add('hidden');
+                    return;
+                }
+
+                document.getElementById('timerBanner').classList.remove('hidden');
+                
+                const currentStepIndex = this.getCurrentStepIndex(mostUrgentBake);
+                const currentStep = mostUrgentBake.steps[currentStepIndex];
+
+                document.getElementById('bannerRecipeName').textContent = mostUrgentBake.recipeName;
                 document.getElementById('bannerCurrentStep').textContent = currentStep.name;
 
-                if (timeRemaining > 0) {
-                    document.getElementById('bannerTimeRemaining').textContent = this.formatTimeRemaining(timeRemaining);
+                if (shortestTimeRemaining > 0) {
+                    document.getElementById('bannerTimeRemaining').textContent = this.formatTimeRemaining(shortestTimeRemaining);
                     document.getElementById('bannerTimeRemaining').style.color = 'white';
                 } else if (!currentStep.completed) {
                     document.getElementById('bannerTimeRemaining').textContent = 'Ready now!';
@@ -1618,13 +1740,37 @@
                     document.getElementById('bannerTimeRemaining').style.color = '#90EE90';
                 }
 
-                if (currentStepIndex < bake.steps.length - 1) {
-                    const nextStep = bake.steps[currentStepIndex + 1];
+                if (currentStepIndex < mostUrgentBake.steps.length - 1) {
+                    const nextStep = mostUrgentBake.steps[currentStepIndex + 1];
                     document.getElementById('bannerNextStep').textContent = 
-                        `Next: ${nextStep.name} at ${nextStep.time.toLocaleString()}`;
+                        `Next: ${nextStep.name} at ${nextStep.time.toLocaleTimeString()}`;
                 } else {
                     document.getElementById('bannerNextStep').textContent = 'Final step!';
                 }
+            },
+
+            getNextActiveBakeId() {
+                if (this.activeBakes.length === 0) return null;
+                
+                // Return the most urgent bake's ID
+                const now = new Date();
+                let mostUrgentBake = this.activeBakes[0];
+                let shortestTimeRemaining = Infinity;
+
+                this.activeBakes.forEach(bake => {
+                    const currentStepIndex = this.getCurrentStepIndex(bake);
+                    const currentStep = bake.steps[currentStepIndex];
+                    
+                    if (!currentStep.completed) {
+                        const timeRemaining = currentStep.time - now;
+                        if (timeRemaining < shortestTimeRemaining) {
+                            shortestTimeRemaining = timeRemaining;
+                            mostUrgentBake = bake;
+                        }
+                    }
+                });
+
+                return mostUrgentBake.id;
             },
 
             formatTimeRemaining(ms) {
@@ -1645,12 +1791,8 @@
                 }
 
                 this.timerInterval = setInterval(() => {
-                    if (this.currentScreen === 'timelineView' && this.currentBakeId) {
-                        const bake = this.activeBakes.find(b => b.id === this.currentBakeId);
-                        if (bake) {
-                            this.updateTimerBanner(bake);
-                        }
-                    }
+                    // Always update the global banner
+                    this.updateGlobalTimerBanner();
 
                     // Check all active bakes for notifications
                     this.checkForNotifications();
@@ -1724,6 +1866,107 @@
                     oscillator.stop(audioContext.currentTime + 0.5);
                 } catch (e) {
                     console.log('Audio not supported');
+                }
+            },
+
+            adjustStepOptions(bakeId, stepIndex) {
+                const bake = this.activeBakes.find(b => b.id === bakeId);
+                if (!bake) return;
+
+                const recipe = RECIPES[bake.recipeKey];
+                const step = recipe.steps[stepIndex];
+                
+                if (!step.options) return;
+
+                // Show options dialog
+                const currentOption = bake.selectedOptions[stepIndex] || 0;
+                const optionsHtml = step.options.map((option, optIndex) => {
+                    return `<option value="${optIndex}" ${optIndex === currentOption ? 'selected' : ''}>${option.name}</option>`;
+                }).join('');
+
+                const modal = document.createElement('div');
+                modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;';
+                modal.innerHTML = `
+                    <div style="background: #1a1a1a; padding: 24px; border-radius: 12px; max-width: 400px; width: 100%; border: 1px solid #2a2a2a;">
+                        <h3 style="color: #ffffff; margin-bottom: 16px;">Adjust ${step.name}</h3>
+                        <select id="optionSelect" style="width: 100%; padding: 12px; background: #0f0f0f; border: 2px solid #2a2a2a; border-radius: 8px; color: #e0e0e0; font-size: 1em; margin-bottom: 16px;">
+                            ${optionsHtml}
+                        </select>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="app.applyOptionChange('${bakeId}', ${stepIndex})" style="flex: 1; background: #667eea; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 1em;">Apply</button>
+                            <button onclick="app.closeModal()" style="flex: 1; background: #2a2a2a; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 1em;">Cancel</button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                this.currentModal = modal;
+            },
+
+            applyOptionChange(bakeId, stepIndex) {
+                const bake = this.activeBakes.find(b => b.id === bakeId);
+                if (!bake) return;
+
+                const newOptionIndex = parseInt(document.getElementById('optionSelect').value);
+                const recipe = RECIPES[bake.recipeKey];
+                const step = recipe.steps[stepIndex];
+                const newOption = step.options[newOptionIndex];
+
+                // Update the selected option
+                bake.selectedOptions[stepIndex] = newOptionIndex;
+
+                // Recalculate times from this step forward
+                const currentStepTime = bake.steps[stepIndex].time;
+                let currentTime = new Date(currentStepTime);
+
+                for (let i = stepIndex; i < recipe.steps.length; i++) {
+                    const recipeStep = recipe.steps[i];
+                    let duration;
+
+                    if (i === stepIndex) {
+                        // Use the newly selected option
+                        duration = newOption.duration;
+                        bake.steps[i].duration = duration;
+                        bake.steps[i].unit = newOption.unit || recipeStep.unit;
+                        bake.steps[i].selectedOption = newOption.name;
+                        bake.steps[i].branch = newOption.branch;
+                    } else {
+                        // Recalculate subsequent steps
+                        if (recipeStep.options) {
+                            const selectedOptionIndex = bake.selectedOptions[i] || 0;
+                            const option = recipeStep.options[selectedOptionIndex];
+                            duration = option.duration;
+                        } else {
+                            if (typeof recipeStep.duration === 'object' && recipeStep.duration.min) {
+                                duration = (recipeStep.duration.min + recipeStep.duration.max) / 2;
+                            } else {
+                                duration = recipeStep.duration;
+                            }
+                        }
+                    }
+
+                    // Update step time
+                    bake.steps[i].time = new Date(currentTime);
+                    bake.steps[i].notified = false; // Reset notification flag
+
+                    // Advance time for next step
+                    const unit = bake.steps[i].unit;
+                    if (unit === 'hours') {
+                        currentTime = new Date(currentTime.getTime() + duration * 60 * 60 * 1000);
+                    } else {
+                        currentTime = new Date(currentTime.getTime() + duration * 60 * 1000);
+                    }
+                }
+
+                this.saveActiveBakes();
+                this.closeModal();
+                this.showTimelineView(bakeId); // Refresh the view
+            },
+
+            closeModal() {
+                if (this.currentModal) {
+                    this.currentModal.remove();
+                    this.currentModal = null;
                 }
             },
 
