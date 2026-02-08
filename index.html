@@ -1802,18 +1802,27 @@
                 document.getElementById('bannerRecipeName').textContent = mostUrgentBake.recipeName;
                 document.getElementById('bannerCurrentStep').textContent = `${mostUrgentBake.recipeName} — ${currentStep.name}`;
 
-                if (shortestTimeRemaining > 0) {
-                    // Calculate progress: time remaining / total wait for this step
-                    const prevStepEnd = currentStepIndex > 0
-                        ? mostUrgentBake.steps[currentStepIndex - 1].time.getTime()
-                        : currentStep.time.getTime() - currentStep.duration * (currentStep.unit === 'hours' ? 3600000 : 60000);
-                    const totalWait = currentStep.time.getTime() - prevStepEnd;
-                    const pct = totalWait > 0
-                        ? Math.max(0, Math.min(100, (shortestTimeRemaining / totalWait) * 100))
-                        : 0;
+                // Calculate time remaining until end of current step
+                const nextStepIndex = currentStepIndex + 1;
+                let timeRemaining;
+                let totalStepDuration;
+
+                if (nextStepIndex < mostUrgentBake.steps.length) {
+                    const stepEnd = mostUrgentBake.steps[nextStepIndex].time.getTime();
+                    const stepStart = currentStep.time.getTime();
+                    timeRemaining = stepEnd - now.getTime();
+                    totalStepDuration = stepEnd - stepStart;
+                } else {
+                    // Last step: use its own duration
+                    totalStepDuration = currentStep.duration * (currentStep.unit === 'hours' ? 3600000 : 60000);
+                    timeRemaining = (currentStep.time.getTime() + totalStepDuration) - now.getTime();
+                }
+
+                if (timeRemaining > 0 && totalStepDuration > 0) {
+                    const pct = Math.max(0, Math.min(100, (timeRemaining / totalStepDuration) * 100));
                     progressFill.classList.remove('done');
                     progressFill.style.width = `${pct}%`;
-                    document.getElementById('bannerTimeRemaining').textContent = this.formatTimeRemaining(shortestTimeRemaining);
+                    document.getElementById('bannerTimeRemaining').textContent = this.formatTimeRemaining(timeRemaining);
                     document.getElementById('bannerTimeRemaining').style.color = 'white';
                 } else if (!currentStep.completed) {
                     progressFill.classList.add('done');
@@ -1868,8 +1877,9 @@
                         countdownTarget = stepEnd - now.getTime();
                         totalStepDuration = stepEnd - stepStart;
                     } else {
-                        countdownTarget = currentStep.time.getTime() - now.getTime();
+                        // Last step: count down its own duration from start time
                         totalStepDuration = currentStep.duration * (currentStep.unit === 'hours' ? 3600000 : 60000);
+                        countdownTarget = (currentStep.time.getTime() + totalStepDuration) - now.getTime();
                     }
 
                     if (countdownTarget > 0 && totalStepDuration > 0) {
