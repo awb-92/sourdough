@@ -85,6 +85,10 @@
             }
         }
 
+        .timer-banner.per-bake {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
         .timer-banner h2 {
             font-size: 1em;
             margin-bottom: 8px;
@@ -790,8 +794,8 @@
         </div>
 
         <!-- Active Timer Banner (shown when there are active bakes) -->
-        <div id="timerBanner" class="timer-banner hidden">
-            <div class="banner-content" onclick="app.showTimelineView(app.getNextActiveBakeId())">
+        <div id="timerBanner" class="timer-banner hidden" onclick="app.handleBannerClick()">
+            <div class="banner-content">
                 <h2 id="bannerRecipeName"></h2>
                 <div class="current-step" id="bannerCurrentStep"></div>
                 <div class="time-remaining" id="bannerTimeRemaining"></div>
@@ -1590,11 +1594,11 @@
                 const currentStepIndex = this.getCurrentStepIndex(bake);
 
                 container.innerHTML = '<h3>Timeline</h3>' + bake.steps.map((step, index) => {
-                    const isCompleted = index < currentStepIndex;
-                    const isActive = index === currentStepIndex;
+                    const isCompleted = step.completed;
+                    const isActive = index === currentStepIndex && !step.completed;
                     const timeStr = step.time.toLocaleString();
-                    const durationStr = step.duration > 0 ? 
-                        `${step.duration} ${step.unit}${step.duration !== 1 ? 's' : ''}` : 
+                    const durationStr = step.duration > 0 ?
+                        `${step.duration} ${step.unit}` :
                         'Ready';
 
                     return `
@@ -1672,9 +1676,8 @@
             },
 
             getCurrentStep(bake) {
-                const now = new Date();
                 for (let i = 0; i < bake.steps.length; i++) {
-                    if (now < bake.steps[i].time || !bake.steps[i].completed) {
+                    if (!bake.steps[i].completed) {
                         return bake.steps[i];
                     }
                 }
@@ -1682,9 +1685,8 @@
             },
 
             getCurrentStepIndex(bake) {
-                const now = new Date();
                 for (let i = 0; i < bake.steps.length; i++) {
-                    if (now < bake.steps[i].time || !bake.steps[i].completed) {
+                    if (!bake.steps[i].completed) {
                         return i;
                     }
                 }
@@ -1692,6 +1694,18 @@
             },
 
             updateGlobalTimerBanner() {
+                // If viewing a specific bake's timeline, show that bake's timer
+                if (this.currentScreen === 'timelineView' && this.currentBakeId) {
+                    const bake = this.activeBakes.find(b => b.id === this.currentBakeId);
+                    if (bake) {
+                        this.updatePerBakeTimerBanner(bake);
+                        return;
+                    }
+                }
+
+                // Global mode: remove per-bake styling
+                document.getElementById('timerBanner').classList.remove('per-bake');
+
                 // Show banner if there are any active bakes
                 if (this.activeBakes.length === 0) {
                     document.getElementById('timerBanner').classList.add('hidden');
@@ -1727,7 +1741,7 @@
                 const currentStep = mostUrgentBake.steps[currentStepIndex];
 
                 document.getElementById('bannerRecipeName').textContent = mostUrgentBake.recipeName;
-                document.getElementById('bannerCurrentStep').textContent = currentStep.name;
+                document.getElementById('bannerCurrentStep').textContent = `${mostUrgentBake.recipeName} — ${currentStep.name}`;
 
                 if (shortestTimeRemaining > 0) {
                     document.getElementById('bannerTimeRemaining').textContent = this.formatTimeRemaining(shortestTimeRemaining);
@@ -1742,7 +1756,52 @@
 
                 if (currentStepIndex < mostUrgentBake.steps.length - 1) {
                     const nextStep = mostUrgentBake.steps[currentStepIndex + 1];
-                    document.getElementById('bannerNextStep').textContent = 
+                    document.getElementById('bannerNextStep').textContent =
+                        `Next: ${nextStep.name} at ${nextStep.time.toLocaleTimeString()}`;
+                } else {
+                    document.getElementById('bannerNextStep').textContent = 'Final step!';
+                }
+            },
+
+            updatePerBakeTimerBanner(bake) {
+                const banner = document.getElementById('timerBanner');
+                const currentStepIndex = this.getCurrentStepIndex(bake);
+                const currentStep = bake.steps[currentStepIndex];
+                const now = new Date();
+
+                banner.classList.remove('hidden');
+                banner.classList.add('per-bake');
+
+                document.getElementById('bannerRecipeName').textContent = bake.recipeName;
+                document.getElementById('bannerCurrentStep').textContent = currentStep.name;
+
+                if (currentStep.completed) {
+                    document.getElementById('bannerTimeRemaining').textContent = 'All steps complete!';
+                    document.getElementById('bannerTimeRemaining').style.color = '#90EE90';
+                } else {
+                    // Countdown to end of current step (= start of next step)
+                    const nextStepIndex = currentStepIndex + 1;
+                    let countdownTarget;
+
+                    if (nextStepIndex < bake.steps.length) {
+                        countdownTarget = bake.steps[nextStepIndex].time.getTime() - now.getTime();
+                    } else {
+                        countdownTarget = currentStep.time.getTime() - now.getTime();
+                    }
+
+                    if (countdownTarget > 0) {
+                        document.getElementById('bannerTimeRemaining').textContent = this.formatTimeRemaining(countdownTarget);
+                        document.getElementById('bannerTimeRemaining').style.color = 'white';
+                    } else {
+                        document.getElementById('bannerTimeRemaining').textContent = 'Ready now!';
+                        document.getElementById('bannerTimeRemaining').style.color = '#ffd700';
+                    }
+                }
+
+                // Next step preview
+                if (currentStepIndex < bake.steps.length - 1) {
+                    const nextStep = bake.steps[currentStepIndex + 1];
+                    document.getElementById('bannerNextStep').textContent =
                         `Next: ${nextStep.name} at ${nextStep.time.toLocaleTimeString()}`;
                 } else {
                     document.getElementById('bannerNextStep').textContent = 'Final step!';
@@ -1773,15 +1832,36 @@
                 return mostUrgentBake.id;
             },
 
+            handleBannerClick() {
+                if (this.currentScreen === 'timelineView' && this.currentBakeId) {
+                    // Already viewing a bake — scroll to the active step
+                    const bake = this.activeBakes.find(b => b.id === this.currentBakeId);
+                    if (bake) {
+                        const activeIndex = this.getCurrentStepIndex(bake);
+                        const stepEl = document.getElementById(`step_${activeIndex}`);
+                        if (stepEl) {
+                            stepEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+                } else {
+                    // On other screens — navigate to the most urgent bake
+                    const bakeId = this.getNextActiveBakeId();
+                    if (bakeId) {
+                        this.showTimelineView(bakeId);
+                    }
+                }
+            },
+
             formatTimeRemaining(ms) {
-                const totalMinutes = Math.floor(ms / 60000);
-                const hours = Math.floor(totalMinutes / 60);
-                const minutes = totalMinutes % 60;
+                const totalSeconds = Math.floor(ms / 1000);
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
 
                 if (hours > 0) {
                     return `${hours}h ${minutes}m`;
                 }
-                return `${minutes}m`;
+                return `${minutes}m ${seconds.toString().padStart(2, '0')}s`;
             },
 
             startTimerUpdates() {
