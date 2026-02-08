@@ -1294,6 +1294,9 @@
                     this.activeBakes.forEach(bake => {
                         bake.steps.forEach(step => {
                             step.time = new Date(step.time);
+                            if (step.completedAt) {
+                                step.completedAt = new Date(step.completedAt);
+                            }
                         });
                     });
                 }
@@ -1527,13 +1530,15 @@
                     } else if (step.options) {
                         const selectedOptionIndex = selectedOptions[index] || 0;
                         const option = step.options[selectedOptionIndex];
-                        duration = option.duration;
+                        // Use option duration, but fall back to step duration if option is 0
+                        duration = option.duration || step.duration || 0;
+                        const unit = option.unit || step.unit;
 
                         bake.steps.push({
                             name: step.name,
                             time: new Date(currentTime),
                             duration,
-                            unit: option.unit || step.unit,
+                            unit,
                             guidance: step.guidance,
                             completed: isCompleted,
                             selectedOption: option.name,
@@ -1542,10 +1547,10 @@
                         });
 
                         // Advance time
-                        if ((option.unit || step.unit) === 'hours') {
-                            currentTime = new Date(currentTime.getTime() + duration * 60 * 60 * 1000);
+                        if (unit === 'hours') {
+                            currentTime = new Date(currentTime.getTime() + duration * 3600000);
                         } else {
-                            currentTime = new Date(currentTime.getTime() + duration * 60 * 1000);
+                            currentTime = new Date(currentTime.getTime() + duration * 60000);
                         }
                     } else {
                         // Handle duration ranges
@@ -1592,13 +1597,13 @@
                         const numSets = step.options[0].sets;
                         total += numSets * step.foldInterval * 60 * 1000;
                     } else if (step.options) {
-                        // Use first option as default
-                        duration = step.options[0].duration;
+                        // Use first option as default, fall back to step duration
+                        duration = step.options[0].duration || step.duration || 0;
                         const unit = step.options[0].unit || step.unit;
                         if (unit === 'hours') {
-                            total += duration * 60 * 60 * 1000;
+                            total += duration * 3600000;
                         } else {
-                            total += duration * 60 * 1000;
+                            total += duration * 60000;
                         }
                     } else {
                         if (typeof step.duration === 'object' && step.duration.min) {
@@ -1726,8 +1731,26 @@
                 const bake = this.activeBakes.find(b => b.id === bakeId);
                 if (!bake) return;
 
+                const now = new Date();
                 bake.steps[stepIndex].completed = true;
+                bake.steps[stepIndex].completedAt = now;
                 bake.currentStepIndex = stepIndex + 1;
+
+                // Recalculate all subsequent step times from now
+                let currentTime = new Date(now);
+                for (let i = stepIndex + 1; i < bake.steps.length; i++) {
+                    bake.steps[i].time = new Date(currentTime);
+                    bake.steps[i].notified = false;
+
+                    const duration = bake.steps[i].duration;
+                    const unit = bake.steps[i].unit;
+                    if (unit === 'hours') {
+                        currentTime = new Date(currentTime.getTime() + duration * 3600000);
+                    } else {
+                        currentTime = new Date(currentTime.getTime() + duration * 60000);
+                    }
+                }
+
                 this.saveActiveBakes();
                 this.renderTimelineSteps(bake);
                 this.updateGlobalTimerBanner();
