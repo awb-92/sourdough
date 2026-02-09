@@ -67,13 +67,28 @@
         /* ─── Recipe Book Card ─── */
         .recipe-book-card { background: #1C1C1E; border-radius: 16px; padding: 16px; margin-bottom: 24px; }
         .recipe-book-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
-        .recipe-book-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 0.5px solid rgba(60,60,67,0.36); cursor: pointer; transition: opacity 0.15s; min-height: 44px; }
+        .recipe-book-item { padding: 12px 0; border-bottom: 0.5px solid rgba(60,60,67,0.36); }
         .recipe-book-item:last-of-type { border-bottom: none; }
-        .recipe-book-item:active { opacity: 0.6; }
+        .recipe-book-item-header { display: flex; align-items: center; cursor: pointer; transition: opacity 0.15s; min-height: 44px; }
+        .recipe-book-item-header:active { opacity: 0.6; }
         .recipe-book-item-info { flex: 1; }
         .recipe-book-item-info h4 { font-size: 17px; font-weight: 600; color: #fff; }
         .recipe-book-item-info p { font-size: 13px; color: #8E8E93; margin-top: 2px; }
-        .recipe-book-item .chevron { color: #8E8E93; font-size: 17px; margin-left: 8px; }
+        .recipe-book-item .chevron { color: #8E8E93; font-size: 17px; margin-left: 8px; transition: transform 0.25s; }
+        .recipe-book-item.expanded .chevron { transform: rotate(90deg); }
+        .recipe-book-detail { overflow: hidden; max-height: 0; transition: max-height 0.35s cubic-bezier(0.36, 0.66, 0.04, 1); }
+        .recipe-book-item.expanded .recipe-book-detail { max-height: 2000px; }
+        .recipe-book-detail-inner { padding: 12px 0 4px; }
+        .recipe-book-detail-inner h5 { font-size: 13px; font-weight: 600; color: #8E8E93; text-transform: uppercase; letter-spacing: 0.04em; margin: 12px 0 6px; }
+        .recipe-book-detail-inner h5:first-child { margin-top: 0; }
+        .recipe-book-detail-inner .rb-ingredient { font-size: 15px; color: #EBEBF5; padding: 4px 0; }
+        .recipe-book-detail-inner .rb-note { font-size: 13px; color: #8E8E93; padding: 8px 12px; background: #2C2C2E; border-radius: 10px; margin: 8px 0; }
+        .recipe-book-detail-inner .rb-step { padding: 8px 0; border-bottom: 0.5px solid rgba(60,60,67,0.18); }
+        .recipe-book-detail-inner .rb-step:last-child { border-bottom: none; }
+        .recipe-book-detail-inner .rb-step-name { font-size: 15px; font-weight: 600; color: #FFFFFF; }
+        .recipe-book-detail-inner .rb-step-meta { font-size: 13px; color: #8E8E93; margin-top: 2px; }
+        .recipe-book-detail-inner .rb-step-tips { font-size: 13px; color: #8E8E93; margin-top: 4px; line-height: 1.5; }
+        .recipe-book-detail-inner .rb-start-btn { margin-top: 12px; }
 
         /* ─── Recipe Cards ─── */
         .recipe-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 16px; }
@@ -713,10 +728,27 @@
                 const recipes = this.getRecipes();
                 const recipe = recipes[this.selectedRecipe];
                 const select = document.getElementById('startingStep');
-                select.innerHTML = recipe.steps.filter(s => !s.branch).map((step, index) => {
+                // Main (non-branch) steps
+                const mainSteps = recipe.steps.filter(s => !s.branch).map((step, index) => {
                     const realIdx = recipe.steps.indexOf(step);
                     return `<option value="${realIdx}">${index === 0 ? 'Beginning: ' : 'Skip to: '}${step.name}</option>`;
-                }).join('');
+                });
+                // Branch steps that make sense as starting points (e.g. baking steps after fridge/freeze)
+                // Group by branch and find the first step of each "bake day" branch (typically "today")
+                const branches = {};
+                recipe.steps.forEach((step, i) => {
+                    if (step.branch) {
+                        if (!branches[step.branch]) branches[step.branch] = [];
+                        branches[step.branch].push({ step, index: i });
+                    }
+                });
+                const branchOptions = [];
+                // "today" branch = bake day steps (e.g. Preheat, Shape, Bake)
+                if (branches['today'] && branches['today'].length > 0) {
+                    const first = branches['today'][0];
+                    branchOptions.push(`<option value="${first.index}">From fridge/freeze: ${first.step.name}</option>`);
+                }
+                select.innerHTML = mainSteps.join('') + branchOptions.join('');
             },
 
             hideAllScreens() {
@@ -888,13 +920,54 @@
                 let html = `<h2>Recipes</h2>`;
                 keys.forEach(key => {
                     const r = recipes[key];
-                    html += `<div class="recipe-book-item" onclick="app.showRecipeDetail('${key}')">
-                        <div class="recipe-book-item-info"><h4>${r.name}</h4><p>${r.description || ''}</p></div>
-                        <span class="chevron">›</span>
+                    // Build ingredients list
+                    let ingHtml = '';
+                    if (r.ingredients) {
+                        ingHtml = r.ingredients.map(ing => `<div class="rb-ingredient">${ing}</div>`).join('');
+                    }
+                    // Note
+                    let noteHtml = r.note ? `<div class="rb-note">${r.note}</div>` : '';
+                    // Build steps list
+                    let stepsHtml = '';
+                    if (r.steps) {
+                        r.steps.forEach(step => {
+                            if (step.branch) return;
+                            let dur = '';
+                            if (step.duration && typeof step.duration === 'object') {
+                                dur = `${step.duration.min}-${step.duration.max} ${step.duration.unit}`;
+                            } else if (step.expandable && step.options) {
+                                dur = step.options.map(o => `${o.sets} sets × ${step.foldInterval}min`).join(' / ');
+                            } else if (step.duration > 0) {
+                                dur = `${step.duration} ${step.unit}`;
+                            } else if (step.options) {
+                                dur = step.options.map(o => o.name).join(' / ');
+                            }
+                            let tips = '';
+                            if (step.guidance && step.guidance.tips) {
+                                tips = `<div class="rb-step-tips">${step.guidance.tips.join(' • ')}</div>`;
+                            }
+                            stepsHtml += `<div class="rb-step"><div class="rb-step-name">${step.name}</div>${dur ? `<div class="rb-step-meta">${dur}</div>` : ''}${tips}</div>`;
+                        });
+                    }
+                    html += `<div class="recipe-book-item" id="rb_${key}">
+                        <div class="recipe-book-item-header" onclick="app.toggleRecipeBook('${key}')">
+                            <div class="recipe-book-item-info"><h4>${r.name}</h4><p>${r.description || ''}</p></div>
+                            <span class="chevron">›</span>
+                        </div>
+                        <div class="recipe-book-detail"><div class="recipe-book-detail-inner">
+                            <h5>Ingredients</h5>${ingHtml}${noteHtml}
+                            <h5>Steps</h5>${stepsHtml}
+                            <button class="btn btn-success rb-start-btn" style="width:100%" onclick="app.showTimelineSetup('${key}')">Start This Recipe</button>
+                        </div></div>
                     </div>`;
                 });
                 html += `<button class="btn btn-secondary mt-20" style="width:100%" onclick="app.showAddRecipe()">+ Add Recipe</button>`;
                 container.innerHTML = html;
+            },
+
+            toggleRecipeBook(key) {
+                const el = document.getElementById(`rb_${key}`);
+                if (el) el.classList.toggle('expanded');
             },
 
             fmtDT(date) {
@@ -1001,8 +1074,19 @@
                 };
 
                 let currentTime = new Date(startTime);
+                const startingFromBranch = recipe.steps[startingStepIndex] && recipe.steps[startingStepIndex].branch;
+                const startBranch = startingFromBranch ? recipe.steps[startingStepIndex].branch : null;
+
                 recipe.steps.forEach((step, index) => {
-                    if (step.branch) return; // skip branch steps during initial timeline
+                    // When starting from a branch step, only include steps in that branch
+                    // from the starting index onward
+                    if (startingFromBranch) {
+                        if (index < startingStepIndex) return;
+                        if (step.branch && step.branch !== startBranch && step.branch !== 'today') return;
+                        if (!step.branch) return; // skip non-branch steps when starting from a branch
+                    } else {
+                        if (step.branch) return; // skip branch steps during initial timeline
+                    }
                     const isCompleted = index < startingStepIndex;
                     let duration;
 
@@ -1053,8 +1137,16 @@
 
             calcTotalDur(recipe, startIdx = 0) {
                 let total = 0;
+                const startingFromBranch = recipe.steps[startIdx] && recipe.steps[startIdx].branch;
+                const startBranch = startingFromBranch ? recipe.steps[startIdx].branch : null;
                 recipe.steps.forEach((step, i) => {
-                    if (i < startIdx || step.branch) return;
+                    if (i < startIdx) return;
+                    if (startingFromBranch) {
+                        if (!step.branch) return;
+                        if (step.branch !== startBranch && step.branch !== 'today') return;
+                    } else {
+                        if (step.branch) return;
+                    }
                     let d;
                     if (step.expandable && step.options) {
                         total += step.options[0].sets * step.foldInterval * 60000;
