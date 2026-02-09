@@ -67,28 +67,13 @@
         /* ─── Recipe Book Card ─── */
         .recipe-book-card { background: #1C1C1E; border-radius: 16px; padding: 16px; margin-bottom: 24px; }
         .recipe-book-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
-        .recipe-book-item { padding: 12px 0; border-bottom: 0.5px solid rgba(60,60,67,0.36); }
+        .recipe-book-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 0.5px solid rgba(60,60,67,0.36); cursor: pointer; transition: opacity 0.15s; min-height: 44px; }
         .recipe-book-item:last-of-type { border-bottom: none; }
-        .recipe-book-item-header { display: flex; align-items: center; cursor: pointer; transition: opacity 0.15s; min-height: 44px; }
-        .recipe-book-item-header:active { opacity: 0.6; }
+        .recipe-book-item:active { opacity: 0.6; }
         .recipe-book-item-info { flex: 1; }
         .recipe-book-item-info h4 { font-size: 17px; font-weight: 600; color: #fff; }
         .recipe-book-item-info p { font-size: 13px; color: #8E8E93; margin-top: 2px; }
-        .recipe-book-item .chevron { color: #8E8E93; font-size: 17px; margin-left: 8px; transition: transform 0.25s; }
-        .recipe-book-item.expanded .chevron { transform: rotate(90deg); }
-        .recipe-book-detail { overflow: hidden; max-height: 0; transition: max-height 0.35s cubic-bezier(0.36, 0.66, 0.04, 1); }
-        .recipe-book-item.expanded .recipe-book-detail { max-height: 2000px; }
-        .recipe-book-detail-inner { padding: 12px 0 4px; }
-        .recipe-book-detail-inner h5 { font-size: 13px; font-weight: 600; color: #8E8E93; text-transform: uppercase; letter-spacing: 0.04em; margin: 12px 0 6px; }
-        .recipe-book-detail-inner h5:first-child { margin-top: 0; }
-        .recipe-book-detail-inner .rb-ingredient { font-size: 15px; color: #EBEBF5; padding: 4px 0; }
-        .recipe-book-detail-inner .rb-note { font-size: 13px; color: #8E8E93; padding: 8px 12px; background: #2C2C2E; border-radius: 10px; margin: 8px 0; }
-        .recipe-book-detail-inner .rb-step { padding: 8px 0; border-bottom: 0.5px solid rgba(60,60,67,0.18); }
-        .recipe-book-detail-inner .rb-step:last-child { border-bottom: none; }
-        .recipe-book-detail-inner .rb-step-name { font-size: 15px; font-weight: 600; color: #FFFFFF; }
-        .recipe-book-detail-inner .rb-step-meta { font-size: 13px; color: #8E8E93; margin-top: 2px; }
-        .recipe-book-detail-inner .rb-step-tips { font-size: 13px; color: #8E8E93; margin-top: 4px; line-height: 1.5; }
-        .recipe-book-detail-inner .rb-start-btn { margin-top: 12px; }
+        .recipe-book-item .chevron { color: #8E8E93; font-size: 17px; margin-left: 8px; }
 
         /* ─── Recipe Cards ─── */
         .recipe-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 16px; }
@@ -233,6 +218,10 @@
         .recipe-detail-step:last-child { border-bottom: none; }
         .recipe-detail-step h4 { font-size: 17px; font-weight: 600; }
         .recipe-detail-step .step-meta { font-size: 13px; color: #8E8E93; margin-top: 2px; }
+        .recipe-detail-branch-label { font-size: 13px; font-weight: 600; color: #0A84FF; text-transform: uppercase; letter-spacing: 0.04em; padding: 14px 0 4px; margin-top: 4px; }
+        .recipe-detail-step .step-visual { font-size: 13px; color: #EBEBF5; margin-top: 4px; line-height: 1.5; }
+        .recipe-detail-step .step-visual li { margin: 2px 0; }
+        .recipe-detail-step .step-tips { font-size: 13px; color: #8E8E93; margin-top: 4px; line-height: 1.5; }
 
         /* ─── Add Recipe Form ─── */
         .add-step-card { background: #2C2C2E; border-radius: 12px; padding: 14px; margin-bottom: 10px; }
@@ -820,26 +809,57 @@
                 el.classList.add('screen-enter');
                 document.getElementById('recipeDetailName').textContent = recipe.name;
 
+                // Ingredients card
                 let html = `<div class="recipe-detail-card"><h3>Ingredients</h3>`;
                 recipe.ingredients.forEach(ing => {
                     html += `<div class="ingredient-item"><label>${ing}</label></div>`;
                 });
                 if (recipe.note) html += `<div class="note">${recipe.note}</div>`;
-                html += `</div><div class="recipe-detail-card"><h3>Steps</h3>`;
+                html += `</div>`;
+
+                // Steps card — show ALL steps including branch steps with section labels
+                html += `<div class="recipe-detail-card"><h3>Steps</h3>`;
+                const branchLabels = {
+                    'today': '🔥 Bake Day',
+                    'cold': '❄️ Cold Proof Option',
+                    'refrigerate': '❄️ Refrigerate Option',
+                    'freeze': '🧊 Freeze Option'
+                };
+                let lastBranch = null;
                 recipe.steps.forEach((step, i) => {
-                    if (step.branch) return;
+                    // Insert branch section label when switching branches
+                    if (step.branch && step.branch !== lastBranch) {
+                        html += `<div class="recipe-detail-branch-label">${branchLabels[step.branch] || step.branch}</div>`;
+                    }
+                    if (!step.branch && lastBranch) {
+                        lastBranch = null; // reset
+                    }
+                    if (step.branch) lastBranch = step.branch;
+
+                    // Duration string
                     let dur = '';
-                    if (step.duration && typeof step.duration === 'object') {
-                        dur = `${step.duration.min}-${step.duration.max} ${step.duration.unit}`;
+                    if (step.expandable && step.options) {
+                        dur = step.options.map(o => `${o.sets} sets × ${step.foldInterval} min`).join(' / ');
+                    } else if (step.duration && typeof step.duration === 'object') {
+                        dur = `${step.duration.min}–${step.duration.max} ${step.duration.unit}`;
                     } else if (step.duration > 0) {
                         dur = `${step.duration} ${step.unit}`;
                     } else if (step.options) {
                         dur = step.options.map(o => o.name).join(' / ');
                     }
+
                     html += `<div class="recipe-detail-step"><h4>${step.name}</h4>`;
                     if (dur) html += `<div class="step-meta">${dur}</div>`;
-                    if (step.guidance && step.guidance.tips) {
-                        html += `<div class="step-meta" style="margin-top:4px">${step.guidance.tips.join(' • ')}</div>`;
+                    if (step.guidance) {
+                        if (step.guidance.visual) {
+                            html += `<div class="step-visual"><ul>${step.guidance.visual.map(v => `<li>${v}</li>`).join('')}</ul></div>`;
+                        }
+                        if (step.guidance.tips) {
+                            html += `<div class="step-tips">${step.guidance.tips.join(' • ')}</div>`;
+                        }
+                    }
+                    if (step.postProofChoice) {
+                        html += `<div class="step-meta" style="margin-top:6px;color:#0A84FF;">↓ Choose next path when baking</div>`;
                     }
                     html += `</div>`;
                 });
@@ -920,54 +940,13 @@
                 let html = `<h2>Recipes</h2>`;
                 keys.forEach(key => {
                     const r = recipes[key];
-                    // Build ingredients list
-                    let ingHtml = '';
-                    if (r.ingredients) {
-                        ingHtml = r.ingredients.map(ing => `<div class="rb-ingredient">${ing}</div>`).join('');
-                    }
-                    // Note
-                    let noteHtml = r.note ? `<div class="rb-note">${r.note}</div>` : '';
-                    // Build steps list
-                    let stepsHtml = '';
-                    if (r.steps) {
-                        r.steps.forEach(step => {
-                            if (step.branch) return;
-                            let dur = '';
-                            if (step.duration && typeof step.duration === 'object') {
-                                dur = `${step.duration.min}-${step.duration.max} ${step.duration.unit}`;
-                            } else if (step.expandable && step.options) {
-                                dur = step.options.map(o => `${o.sets} sets × ${step.foldInterval}min`).join(' / ');
-                            } else if (step.duration > 0) {
-                                dur = `${step.duration} ${step.unit}`;
-                            } else if (step.options) {
-                                dur = step.options.map(o => o.name).join(' / ');
-                            }
-                            let tips = '';
-                            if (step.guidance && step.guidance.tips) {
-                                tips = `<div class="rb-step-tips">${step.guidance.tips.join(' • ')}</div>`;
-                            }
-                            stepsHtml += `<div class="rb-step"><div class="rb-step-name">${step.name}</div>${dur ? `<div class="rb-step-meta">${dur}</div>` : ''}${tips}</div>`;
-                        });
-                    }
-                    html += `<div class="recipe-book-item" id="rb_${key}">
-                        <div class="recipe-book-item-header" onclick="app.toggleRecipeBook('${key}')">
-                            <div class="recipe-book-item-info"><h4>${r.name}</h4><p>${r.description || ''}</p></div>
-                            <span class="chevron">›</span>
-                        </div>
-                        <div class="recipe-book-detail"><div class="recipe-book-detail-inner">
-                            <h5>Ingredients</h5>${ingHtml}${noteHtml}
-                            <h5>Steps</h5>${stepsHtml}
-                            <button class="btn btn-success rb-start-btn" style="width:100%" onclick="app.showTimelineSetup('${key}')">Start This Recipe</button>
-                        </div></div>
+                    html += `<div class="recipe-book-item" onclick="app.showRecipeDetail('${key}')">
+                        <div class="recipe-book-item-info"><h4>${r.name}</h4><p>${r.description || ''}</p></div>
+                        <span class="chevron">›</span>
                     </div>`;
                 });
                 html += `<button class="btn btn-secondary mt-20" style="width:100%" onclick="app.showAddRecipe()">+ Add Recipe</button>`;
                 container.innerHTML = html;
-            },
-
-            toggleRecipeBook(key) {
-                const el = document.getElementById(`rb_${key}`);
-                if (el) el.classList.toggle('expanded');
             },
 
             fmtDT(date) {
