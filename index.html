@@ -7,11 +7,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Sourdough">
     <title>Sourdough Timer</title>
-    
+
     <!-- iOS Icons -->
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' fill='%23667eea'/><text x='50%' y='50%' text-anchor='middle' dy='.35em' font-size='100' fill='white'>🍞</text></svg>">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>🍞</text></svg>">
-    
+
     <!-- Theme Color -->
     <meta name="theme-color" content="#000000">
     <style>
@@ -27,10 +27,15 @@
             background: #000000;
             color: #FFFFFF;
             padding: 16px;
-            padding-bottom: 80px;
-            line-height: 1.5;
+            padding-top: calc(16px + env(safe-area-inset-top));
+            padding-bottom: calc(80px + env(safe-area-inset-bottom));
+            padding-left: calc(16px + env(safe-area-inset-left));
+            padding-right: calc(16px + env(safe-area-inset-right));
+            font-size: 17px;
+            line-height: 1.47;
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
+            overscroll-behavior: contain;
         }
 
         .container {
@@ -41,81 +46,85 @@
         h1 {
             color: #ffffff;
             margin-bottom: 6px;
-            font-size: 2.1em;
+            font-size: 34px;
             font-weight: 700;
-            letter-spacing: -0.02em;
+            letter-spacing: 0.37px;
         }
 
         @media (min-width: 768px) {
             body { padding: 20px; }
-            h1 { font-size: 2.4em; }
         }
 
         /* ─── Active Timer Banner ─── */
         .timer-banner {
             position: sticky;
-            top: -16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            top: -1px;
+            background: #1C1C1E;
             color: white;
-            padding: 18px 20px;
+            padding: 14px 16px;
             border-radius: 16px;
-            margin: 0 -16px 20px -16px;
+            margin-bottom: 16px;
             z-index: 100;
             cursor: pointer;
             transition: transform 0.15s;
         }
 
-        .timer-banner:active { transform: scale(0.98); }
+        .timer-banner:active { transform: scale(0.96); }
         .timer-banner .banner-content { pointer-events: none; }
 
-        @media (min-width: 768px) {
-            .timer-banner { top: 0; margin: 0 0 24px 0; padding: 22px 24px; }
+        .timer-banner.per-bake {
+            background: #1C1C1E;
         }
 
-        .timer-banner.per-bake {
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        .timer-banner .banner-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 4px;
         }
 
         .timer-banner h2 {
-            font-size: 0.75em;
+            font-size: 13px;
             font-weight: 500;
             margin-bottom: 2px;
-            opacity: 0.7;
+            opacity: 0.5;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
         }
 
         .timer-banner .current-step {
-            font-size: 1.15em;
+            font-size: 17px;
             font-weight: 600;
         }
 
         .timer-banner .time-remaining {
-            font-size: 2.8em;
-            font-weight: 700;
-            margin: 2px 0;
-            letter-spacing: -0.03em;
+            font-size: 15px;
+            font-weight: 600;
             font-variant-numeric: tabular-nums;
+            color: #8E8E93;
+            text-align: right;
+            flex-shrink: 0;
         }
 
         .timer-banner .next-step {
-            opacity: 0.65;
-            font-size: 0.85em;
+            opacity: 0.5;
+            font-size: 13px;
             font-weight: 400;
+            margin-top: 4px;
         }
 
         .timer-progress-bar {
             width: 100%;
             height: 4px;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
             border-radius: 2px;
-            margin: 8px 0 6px;
+            margin: 8px 0 4px;
             overflow: hidden;
         }
 
         .timer-progress-fill {
             height: 100%;
-            background: rgba(255,255,255,0.85);
+            background: #30D158;
             border-radius: 2px;
             transition: width 1s linear;
             width: 100%;
@@ -134,9 +143,9 @@
             padding: 14px 20px;
             border-radius: 12px;
             cursor: pointer;
-            font-size: 1em;
+            font-size: 17px;
             font-weight: 600;
-            transition: opacity 0.15s;
+            transition: transform 0.1s, opacity 0.15s;
             min-height: 50px;
             display: inline-flex;
             align-items: center;
@@ -144,7 +153,7 @@
             touch-action: manipulation;
         }
 
-        .btn:active { opacity: 0.7; }
+        .btn:active { transform: scale(0.96); opacity: 0.7; }
 
         @media (hover: hover) {
             .btn:hover { opacity: 0.85; }
@@ -164,6 +173,36 @@
             color: #000000;
         }
 
+        /* ─── iOS Back Button ─── */
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #2C2C2E;
+            border: none;
+            color: #0A84FF;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s, opacity 0.15s;
+            touch-action: manipulation;
+            flex-shrink: 0;
+        }
+
+        .back-btn:active { transform: scale(0.90); opacity: 0.7; }
+
+        .back-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: #0A84FF;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
         /* ─── Active Bakes Section ─── */
         .active-bakes {
             margin-bottom: 24px;
@@ -171,11 +210,11 @@
 
         .active-bakes h2,
         #timelineSteps h3 {
-            font-size: 1.3em;
+            font-size: 22px;
             font-weight: 700;
             color: #ffffff;
             margin-bottom: 12px;
-            letter-spacing: -0.01em;
+            letter-spacing: -0.26px;
         }
 
         .bake-card {
@@ -197,13 +236,13 @@
         .bake-card-info h3 {
             color: #ffffff;
             margin-bottom: 4px;
-            font-size: 1.1em;
+            font-size: 17px;
             font-weight: 600;
         }
 
         .bake-card-info p {
             color: #8E8E93;
-            font-size: 0.85em;
+            font-size: 13px;
             line-height: 1.4;
         }
 
@@ -237,14 +276,14 @@
             padding: 20px;
             border-radius: 16px;
             cursor: pointer;
-            transition: opacity 0.15s;
+            transition: transform 0.1s, opacity 0.15s;
             min-height: 90px;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
 
-        .recipe-card:active { opacity: 0.7; }
+        .recipe-card:active { transform: scale(0.96); opacity: 0.7; }
 
         @media (hover: hover) {
             .recipe-card:hover { opacity: 0.85; }
@@ -253,13 +292,13 @@
         .recipe-card h3 {
             color: #ffffff;
             margin-bottom: 4px;
-            font-size: 1.1em;
+            font-size: 17px;
             font-weight: 600;
         }
 
         .recipe-card p {
             color: #8E8E93;
-            font-size: 0.9em;
+            font-size: 15px;
             line-height: 1.4;
         }
 
@@ -274,46 +313,36 @@
             .timeline-setup { padding: 24px; }
         }
 
-        .mode-selector {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-            margin: 16px 0;
-        }
-
-        @media (min-width: 600px) {
-            .mode-selector { grid-template-columns: 1fr 1fr; }
-        }
-
-        .mode-btn {
-            padding: 16px;
-            border: 2px solid #3A3A3C;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: all 0.15s;
-            text-align: center;
-            background: #000000;
-            min-height: 90px;
+        /* ─── iOS Segmented Control ─── */
+        .segmented-control {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
+            background: #2C2C2E;
+            border-radius: 10px;
+            padding: 2px;
+            margin: 16px 0;
+            position: relative;
         }
 
-        .mode-btn.active {
-            border-color: #0A84FF;
-            background: #0A84FF10;
-        }
-
-        .mode-btn h3 {
-            color: #ffffff;
-            margin-bottom: 4px;
-            font-size: 1em;
+        .segmented-btn {
+            flex: 1;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: transparent;
+            color: #FFFFFF;
+            font-size: 13px;
             font-weight: 600;
+            transition: all 0.2s cubic-bezier(0.36, 0.66, 0.04, 1);
+            text-align: center;
+            min-height: 32px;
+            z-index: 1;
+            position: relative;
         }
 
-        .mode-btn p {
-            color: #8E8E93;
-            font-size: 0.85em;
+        .segmented-btn.active {
+            background: #636366;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
 
         .form-group {
@@ -325,7 +354,7 @@
             margin-bottom: 8px;
             color: #8E8E93;
             font-weight: 500;
-            font-size: 0.9em;
+            font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 0.02em;
         }
@@ -335,7 +364,7 @@
             padding: 14px;
             border: none;
             border-radius: 12px;
-            font-size: 1em;
+            font-size: 17px;
             background: #2C2C2E;
             color: #FFFFFF;
             min-height: 50px;
@@ -347,7 +376,7 @@
         }
 
         .form-group .hint {
-            font-size: 0.8em;
+            font-size: 13px;
             color: #8E8E93;
             margin-top: 6px;
         }
@@ -358,7 +387,7 @@
         .options-section h3 {
             color: #ffffff;
             margin-bottom: 12px;
-            font-size: 1.1em;
+            font-size: 17px;
             font-weight: 600;
         }
 
@@ -372,40 +401,43 @@
         .option-group h4 {
             color: #FFFFFF;
             margin-bottom: 10px;
-            font-size: 1em;
+            font-size: 17px;
             font-weight: 600;
         }
 
-        .radio-group {
+        /* ─── iOS Pill Chips (replaces radio buttons) ─── */
+        .pill-group {
             display: flex;
-            flex-direction: column;
+            flex-wrap: wrap;
             gap: 8px;
             margin-top: 8px;
         }
 
-        @media (min-width: 600px) {
-            .radio-group { flex-direction: row; gap: 16px; }
+        .pill-chip {
+            display: none;
         }
 
-        .radio-option {
-            display: flex;
+        .pill-chip + label {
+            display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px;
-            min-height: 44px;
-        }
-
-        .radio-option label {
+            padding: 8px 16px;
+            background: #3A3A3C;
+            border-radius: 20px;
             color: #FFFFFF;
+            font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
-            font-size: 0.95em;
+            transition: all 0.2s;
+            min-height: 36px;
         }
 
-        .radio-option input[type="radio"] {
-            width: 22px;
-            height: 22px;
-            cursor: pointer;
-            accent-color: #0A84FF;
+        .pill-chip:checked + label {
+            background: #0A84FF;
+            color: #FFFFFF;
+        }
+
+        .pill-chip + label:active {
+            transform: scale(0.96);
         }
 
         /* ─── Step Selector ─── */
@@ -419,7 +451,7 @@
         .step-selector h4 {
             color: #FFFFFF;
             margin-bottom: 10px;
-            font-size: 1em;
+            font-size: 17px;
             font-weight: 600;
         }
 
@@ -430,7 +462,7 @@
             border: none;
             border-radius: 10px;
             color: #FFFFFF;
-            font-size: 1em;
+            font-size: 17px;
             min-height: 50px;
             cursor: pointer;
         }
@@ -441,7 +473,7 @@
         }
 
         .step-selector .hint {
-            font-size: 0.8em;
+            font-size: 13px;
             color: #8E8E93;
             margin-top: 6px;
         }
@@ -457,7 +489,7 @@
         .ingredients-section h3 {
             color: #ffffff;
             margin-bottom: 10px;
-            font-size: 1.1em;
+            font-size: 17px;
             font-weight: 600;
         }
 
@@ -466,8 +498,8 @@
             align-items: center;
             gap: 12px;
             padding: 12px 0;
-            border-bottom: 0.5px solid #3A3A3C;
-            min-height: 48px;
+            border-bottom: 0.5px solid rgba(60,60,67,0.36);
+            min-height: 44px;
         }
 
         .ingredient-item:last-child { border-bottom: none; }
@@ -476,14 +508,14 @@
             color: #FFFFFF;
             cursor: pointer;
             flex: 1;
-            font-size: 0.95em;
+            font-size: 17px;
         }
 
         .ingredient-item input[type="checkbox"] {
             width: 24px;
             height: 24px;
             cursor: pointer;
-            accent-color: #0A84FF;
+            accent-color: #30D158;
             flex-shrink: 0;
         }
 
@@ -501,22 +533,38 @@
 
         .timeline-view h2 {
             color: #ffffff;
-            font-size: 1.4em;
+            font-size: 22px;
             font-weight: 700;
         }
 
         .timeline-view > div > p {
             color: #8E8E93;
-            font-size: 0.85em;
+            font-size: 13px;
             margin-top: 2px;
         }
 
+        /* ─── Screen Header with Back Button ─── */
+        .screen-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .screen-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+            flex: 1;
+        }
+
+        /* ─── Step Card ─── */
         .step-card {
             background: #1C1C1E;
             padding: 16px;
             border-radius: 14px;
             margin: 10px 0;
             border-left: none;
+            transition: all 0.3s cubic-bezier(0.36, 0.66, 0.04, 1);
         }
 
         .step-card.completed {
@@ -525,7 +573,7 @@
 
         .step-card.active {
             background: #1C1C1E;
-            box-shadow: 0 0 0 2px #0A84FF;
+            box-shadow: 0 0 0 2px #FFFFFF;
         }
 
         .step-header {
@@ -537,50 +585,78 @@
         }
 
         .step-title {
-            font-size: 1.05em;
+            font-size: 17px;
             font-weight: 600;
             color: #ffffff;
             line-height: 1.3;
+            flex: 1;
+        }
+
+        /* ─── Info Button (replaces Show Guidance) ─── */
+        .info-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: transparent;
+            border: 1.5px solid #8E8E93;
+            color: #8E8E93;
+            font-size: 14px;
+            font-weight: 600;
+            font-style: italic;
+            font-family: Georgia, 'Times New Roman', serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .info-btn.active {
+            background: #0A84FF;
+            border-color: #0A84FF;
+            color: #FFFFFF;
+        }
+
+        .info-btn:active {
+            transform: scale(0.90);
         }
 
         .step-time {
-            color: #0A84FF;
+            color: #8E8E93;
             font-weight: 500;
-            font-size: 0.85em;
+            font-size: 13px;
             text-align: right;
             flex-shrink: 0;
+            font-variant-numeric: tabular-nums;
         }
 
         .step-duration {
             color: #8E8E93;
-            font-size: 0.85em;
+            font-size: 13px;
             margin: 2px 0;
         }
 
         .step-guidance {
-            margin-top: 10px;
-        }
-
-        .guidance-toggle {
-            background: none;
-            border: none;
-            color: #0A84FF;
-            cursor: pointer;
-            font-size: 0.9em;
-            padding: 8px 0;
-            text-decoration: none;
-            font-weight: 500;
-            min-height: 44px;
+            margin-top: 0;
         }
 
         .guidance-content {
-            margin-top: 8px;
+            margin-top: 10px;
             padding: 14px;
             background: #2C2C2E;
             border-radius: 12px;
-            font-size: 0.9em;
+            font-size: 15px;
             line-height: 1.6;
             color: #EBEBF5;
+            animation: expandIn 0.25s cubic-bezier(0.36, 0.66, 0.04, 1);
+        }
+
+        @keyframes expandIn {
+            from { opacity: 0; max-height: 0; padding: 0 14px; margin-top: 0; }
+            to { opacity: 1; max-height: 500px; padding: 14px; margin-top: 10px; }
         }
 
         .guidance-content strong {
@@ -594,6 +670,66 @@
 
         .guidance-content li {
             margin: 4px 0;
+        }
+
+        /* ─── iOS Toggle Slider (replaces Mark Complete) ─── */
+        .step-toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 14px;
+        }
+
+        .step-toggle-label {
+            font-size: 15px;
+            color: #8E8E93;
+            font-weight: 500;
+        }
+
+        .ios-toggle {
+            position: relative;
+            width: 51px;
+            height: 31px;
+            flex-shrink: 0;
+        }
+
+        .ios-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .ios-toggle .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #39393D;
+            border-radius: 31px;
+            transition: background 0.3s;
+        }
+
+        .ios-toggle .slider::before {
+            content: '';
+            position: absolute;
+            height: 27px;
+            width: 27px;
+            left: 2px;
+            bottom: 2px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s cubic-bezier(0.36, 0.66, 0.04, 1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .ios-toggle input:checked + .slider {
+            background: #30D158;
+        }
+
+        .ios-toggle input:checked + .slider::before {
+            transform: translateX(20px);
         }
 
         .step-actions {
@@ -627,27 +763,34 @@
 
         .gap-10 { gap: 10px; }
 
-        /* ─── Notification Status ─── */
+        /* ─── Notification Status (small, bottom of home) ─── */
         .notification-status {
-            background: #1C1C1E;
-            padding: 16px;
-            border-radius: 16px;
-            margin-bottom: 20px;
+            padding: 10px 16px;
+            border-radius: 12px;
             text-align: center;
+            margin-top: 24px;
         }
 
         .notification-status p {
-            color: #FFFFFF;
-            margin-bottom: 12px;
-            font-size: 0.9em;
+            color: #8E8E93;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .notification-status .btn {
+            font-size: 13px;
+            padding: 8px 16px;
+            min-height: 34px;
+            background: #2C2C2E;
         }
 
         .notification-status.success {
-            background: #30D15820;
+            background: transparent;
         }
 
         .notification-status.success p {
             color: #30D158;
+            font-size: 13px;
         }
 
         /* ─── Empty State ─── */
@@ -657,6 +800,158 @@
             padding: 40px 20px;
             background: #1C1C1E;
             border-radius: 16px;
+            font-size: 17px;
+            opacity: 0.6;
+        }
+
+        /* ─── Screen Transitions ─── */
+        .screen-enter {
+            animation: screenSlideIn 0.35s cubic-bezier(0.36, 0.66, 0.04, 1);
+        }
+
+        @keyframes screenSlideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ─── Context Menu ─── */
+        .context-menu {
+            position: fixed;
+            background: rgba(44, 44, 46, 0.95);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-radius: 14px;
+            padding: 6px;
+            min-width: 200px;
+            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .context-menu-item {
+            padding: 10px 16px;
+            color: #FFFFFF;
+            font-size: 17px;
+            cursor: pointer;
+            border-radius: 10px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+        }
+
+        .context-menu-item:active {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .context-menu-separator {
+            height: 0.5px;
+            background: rgba(60,60,67,0.36);
+            margin: 4px 0;
+        }
+
+        /* ─── Notification Banner ─── */
+        .notification-toast {
+            position: fixed;
+            top: calc(env(safe-area-inset-top) + 8px);
+            left: 16px;
+            right: 16px;
+            background: rgba(44, 44, 46, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 14px 16px;
+            z-index: 2000;
+            animation: slideDown 0.4s cubic-bezier(0.36, 0.66, 0.04, 1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .notification-toast-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .notification-toast-body {
+            font-size: 13px;
+            color: #8E8E93;
+        }
+
+        /* ─── Post-proof choice cards ─── */
+        .choice-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .choice-card {
+            background: #2C2C2E;
+            border-radius: 12px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .choice-card:active {
+            transform: scale(0.96);
+            opacity: 0.7;
+        }
+
+        .choice-card-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .choice-card-text h4 {
+            font-size: 17px;
+            font-weight: 600;
+            color: #FFFFFF;
+            margin-bottom: 2px;
+        }
+
+        .choice-card-text p {
+            font-size: 13px;
+            color: #8E8E93;
+        }
+
+        /* ─── Frozen step input ─── */
+        .frozen-input-section {
+            margin-top: 10px;
+            padding: 14px;
+            background: #2C2C2E;
+            border-radius: 12px;
+        }
+
+        .frozen-input-section label {
+            font-size: 13px;
+            color: #8E8E93;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .frozen-input-section input {
+            width: 100%;
+            padding: 12px;
+            background: #1C1C1E;
+            border: none;
+            border-radius: 10px;
+            color: #FFFFFF;
+            font-size: 17px;
+            min-height: 44px;
+        }
+
+        .frozen-input-section .btn {
+            margin-top: 10px;
+            width: 100%;
         }
 
         /* ─── Scrollbar ─── */
@@ -664,27 +959,30 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #3A3A3C; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #48484A; }
+
+        /* ─── iOS List Dividers ─── */
+        .list-divider {
+            border-bottom: 0.5px solid rgba(60,60,67,0.36);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🍞 Sourdough Timer</h1>
 
-        <!-- Notification Status -->
-        <div id="notificationStatus" class="notification-status hidden">
-            <p>📢 Enable notifications to get alerts when steps are ready</p>
-            <button class="btn btn-secondary" onclick="app.requestNotificationPermission()">Enable Notifications</button>
-        </div>
-
         <!-- Active Timer Banner (shown when there are active bakes) -->
         <div id="timerBanner" class="timer-banner hidden" onclick="app.handleBannerClick()">
             <div class="banner-content">
-                <h2 id="bannerRecipeName"></h2>
-                <div class="current-step" id="bannerCurrentStep"></div>
+                <div class="banner-top-row">
+                    <div>
+                        <h2 id="bannerRecipeName"></h2>
+                        <div class="current-step" id="bannerCurrentStep"></div>
+                    </div>
+                    <div class="time-remaining" id="bannerTimeRemaining"></div>
+                </div>
                 <div class="timer-progress-bar">
                     <div class="timer-progress-fill" id="bannerProgressFill"></div>
                 </div>
-                <div class="time-remaining" id="bannerTimeRemaining"></div>
                 <div class="next-step" id="bannerNextStep"></div>
             </div>
         </div>
@@ -699,31 +997,37 @@
                 </div>
                 <div id="activeBakesList"></div>
             </div>
+            <!-- Notification Status (bottom of home) -->
+            <div id="notificationStatus" class="notification-status hidden">
+                <p>Enable notifications to get alerts when steps are ready</p>
+                <button class="btn btn-secondary" onclick="app.requestNotificationPermission()">Enable Notifications</button>
+            </div>
         </div>
 
         <!-- Recipe Selection Screen -->
         <div id="recipeSelection" class="hidden">
-            <button class="btn btn-secondary mb-20" onclick="app.showMainScreen()">← Back</button>
-            <h2 class="mb-20">Choose a Recipe</h2>
+            <div class="screen-header">
+                <button class="back-btn" onclick="app.showMainScreen()">
+                    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <h2>Choose a Recipe</h2>
+            </div>
             <div class="recipe-grid" id="recipeGrid"></div>
         </div>
 
         <!-- Timeline Setup Screen -->
         <div id="timelineSetup" class="hidden">
-            <button class="btn btn-secondary mb-20" onclick="app.showRecipeSelection()">← Back</button>
+            <div class="screen-header">
+                <button class="back-btn" onclick="app.showRecipeSelection()">
+                    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <h2 id="setupRecipeName"></h2>
+            </div>
             <div class="timeline-setup">
-                <h2 id="setupRecipeName" class="mb-20"></h2>
-                
-                <!-- Mode Selection -->
-                <div class="mode-selector">
-                    <div class="mode-btn active" data-mode="forward" onclick="app.selectMode('forward')">
-                        <h3>Starting Now</h3>
-                        <p>Calculate when everything will be ready</p>
-                    </div>
-                    <div class="mode-btn" data-mode="backward" onclick="app.selectMode('backward')">
-                        <h3>Target End Time</h3>
-                        <p>Plan when to start for a specific finish</p>
-                    </div>
+                <!-- iOS Segmented Control -->
+                <div class="segmented-control">
+                    <button class="segmented-btn active" data-mode="forward" onclick="app.selectMode('forward')">Starting Now</button>
+                    <button class="segmented-btn" data-mode="backward" onclick="app.selectMode('backward')">Target End Time</button>
                 </div>
 
                 <!-- Time Input -->
@@ -756,17 +1060,18 @@
 
         <!-- Timeline View Screen -->
         <div id="timelineView" class="hidden">
-            <button class="btn btn-secondary mb-20" onclick="app.showMainScreen()">← Back to Active Bakes</button>
-            
-            <div class="timeline-view">
-                <div class="flex-between mb-20">
-                    <div>
-                        <h2 id="timelineRecipeName"></h2>
-                        <p id="timelineStartEnd"></p>
-                    </div>
-                    <button class="btn btn-danger" onclick="app.finishBake()">Finish & Archive</button>
+            <div class="screen-header">
+                <button class="back-btn" onclick="app.showMainScreen()">
+                    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <div style="flex: 1;">
+                    <h2 id="timelineRecipeName"></h2>
+                    <p id="timelineStartEnd" style="color: #8E8E93; font-size: 13px; margin-top: 2px;"></p>
                 </div>
+                <button class="btn btn-danger" style="font-size: 13px; padding: 8px 14px; min-height: 34px;" onclick="app.finishBake()">Finish</button>
+            </div>
 
+            <div class="timeline-view">
                 <!-- Ingredients Checklist -->
                 <div id="ingredientsSection" class="ingredients-section"></div>
 
@@ -820,7 +1125,7 @@
                     {
                         name: "Stretch & folds",
                         expandable: true,
-                        foldInterval: 30, // minutes between each fold
+                        foldInterval: 30,
                         options: [
                             { name: "3 sets", sets: 3 },
                             { name: "4 sets", sets: 4 },
@@ -946,24 +1251,19 @@
                         name: "Divide + ball",
                         duration: 5,
                         unit: "minutes",
-                        options: [
-                            { name: "Use today", duration: 0, branch: "today" },
-                            { name: "Refrigerate (2 days)", duration: 0, branch: "refrigerate" },
-                            { name: "Freeze (2 months)", duration: 0, branch: "freeze" }
-                        ],
                         guidance: {
                             visual: ["Divide into 2 dough balls", "Lightly oil to prevent sticking", "Cover"],
-                            tips: ["Choose your path: today, fridge, or freezer"]
+                            tips: ["Shape into tight balls for better structure"]
                         }
                     },
                     {
                         name: "Proof dough balls",
                         duration: { min: 60, max: 120, unit: "minutes" },
-                        branch: "today",
                         guidance: {
                             visual: ["Let balls proof until puffy and soft", "Should stretch without snapping back hard"],
                             tips: ["Ready when relaxed and stretchy"]
-                        }
+                        },
+                        postProofChoice: true
                     },
                     {
                         name: "Preheat oven",
@@ -1123,17 +1423,17 @@
 
             checkNotificationPermission() {
                 if (!('Notification' in window)) {
-                    return; // Notifications not supported
+                    return;
                 }
 
                 const statusEl = document.getElementById('notificationStatus');
-                
+
                 if (Notification.permission === 'default') {
                     statusEl.classList.remove('hidden', 'success');
                 } else if (Notification.permission === 'granted') {
                     statusEl.classList.remove('hidden');
                     statusEl.classList.add('success');
-                    statusEl.innerHTML = '<p>✅ Notifications enabled - you\'ll be alerted when steps are ready</p>';
+                    statusEl.innerHTML = '<p>✅ Notifications enabled</p>';
                 } else {
                     statusEl.classList.add('hidden');
                 }
@@ -1151,7 +1451,6 @@
                 const saved = localStorage.getItem('activeBakes');
                 if (saved) {
                     this.activeBakes = JSON.parse(saved);
-                    // Convert date strings back to Date objects
                     this.activeBakes.forEach(bake => {
                         bake.steps.forEach(step => {
                             step.time = new Date(step.time);
@@ -1170,7 +1469,7 @@
             populateStartingSteps() {
                 const recipe = RECIPES[this.selectedRecipe];
                 const select = document.getElementById('startingStep');
-                
+
                 select.innerHTML = recipe.steps.map((step, index) => {
                     return `<option value="${index}">${index === 0 ? 'Beginning: ' : 'Skip to: '}${step.name}</option>`;
                 }).join('');
@@ -1178,14 +1477,17 @@
 
             showMainScreen() {
                 this.hideAllScreens();
-                document.getElementById('mainScreen').classList.remove('hidden');
+                const el = document.getElementById('mainScreen');
+                el.classList.remove('hidden');
                 this.updateGlobalTimerBanner();
                 this.currentScreen = 'main';
             },
 
             showRecipeSelection() {
                 this.hideAllScreens();
-                document.getElementById('recipeSelection').classList.remove('hidden');
+                const el = document.getElementById('recipeSelection');
+                el.classList.remove('hidden');
+                el.classList.add('screen-enter');
                 this.renderRecipeGrid();
                 this.updateGlobalTimerBanner();
                 this.currentScreen = 'recipeSelection';
@@ -1194,7 +1496,9 @@
             showTimelineSetup(recipeKey) {
                 this.hideAllScreens();
                 this.selectedRecipe = recipeKey;
-                document.getElementById('timelineSetup').classList.remove('hidden');
+                const el = document.getElementById('timelineSetup');
+                el.classList.remove('hidden');
+                el.classList.add('screen-enter');
                 document.getElementById('setupRecipeName').textContent = RECIPES[recipeKey].name;
                 this.renderRecipeOptions();
                 this.populateStartingSteps();
@@ -1208,11 +1512,13 @@
                 const bake = this.activeBakes.find(b => b.id === bakeId);
                 if (!bake) return;
 
-                document.getElementById('timelineView').classList.remove('hidden');
+                const el = document.getElementById('timelineView');
+                el.classList.remove('hidden');
+                el.classList.add('screen-enter');
                 document.getElementById('timelineRecipeName').textContent = bake.recipeName;
-                
-                const startTime = new Date(bake.steps[0].time).toLocaleString();
-                const endTime = new Date(bake.steps[bake.steps.length - 1].time).toLocaleString();
+
+                const startTime = this.formatMilitaryDateTime(new Date(bake.steps[0].time));
+                const endTime = this.formatMilitaryDateTime(new Date(bake.steps[bake.steps.length - 1].time));
                 document.getElementById('timelineStartEnd').textContent = `${startTime} → ${endTime}`;
 
                 this.renderIngredients(bake);
@@ -1222,10 +1528,22 @@
             },
 
             hideAllScreens() {
-                document.getElementById('mainScreen').classList.add('hidden');
-                document.getElementById('recipeSelection').classList.add('hidden');
-                document.getElementById('timelineSetup').classList.add('hidden');
-                document.getElementById('timelineView').classList.add('hidden');
+                ['mainScreen', 'recipeSelection', 'timelineSetup', 'timelineView'].forEach(id => {
+                    const el = document.getElementById(id);
+                    el.classList.add('hidden');
+                    el.classList.remove('screen-enter');
+                });
+            },
+
+            // Format date/time in military (24h) format, gray
+            formatMilitaryDateTime(date) {
+                const day = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                return `${day} ${time}`;
+            },
+
+            formatMilitaryTime(date) {
+                return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
             },
 
             renderActiveBakes() {
@@ -1241,7 +1559,7 @@
                         <div class="bake-card">
                             <div class="bake-card-info">
                                 <h3>${bake.recipeName}</h3>
-                                <p>Current: ${currentStep.name} • Started: ${new Date(bake.steps[0].time).toLocaleString()}</p>
+                                <p>Current: ${currentStep.name} • Started: ${this.formatMilitaryDateTime(new Date(bake.steps[0].time))}</p>
                             </div>
                             <div class="bake-card-actions">
                                 <button class="btn" onclick="app.showTimelineView('${bake.id}')">Continue</button>
@@ -1250,7 +1568,7 @@
                         </div>
                     `;
                 }).join('');
-                
+
                 this.updateGlobalTimerBanner();
             },
 
@@ -1269,10 +1587,10 @@
 
             selectMode(mode) {
                 this.mode = mode;
-                document.querySelectorAll('.mode-btn').forEach(btn => {
+                document.querySelectorAll('.segmented-btn').forEach(btn => {
                     btn.classList.remove('active');
                 });
-                document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+                document.querySelector(`.segmented-btn[data-mode="${mode}"]`).classList.add('active');
 
                 if (mode === 'forward') {
                     document.getElementById('startTimeGroup').classList.remove('hidden');
@@ -1293,7 +1611,7 @@
             renderRecipeOptions() {
                 const recipe = RECIPES[this.selectedRecipe];
                 const container = document.getElementById('recipeOptions');
-                
+
                 const optionSteps = recipe.steps.filter(step => step.options);
                 if (optionSteps.length === 0) {
                     container.innerHTML = '';
@@ -1305,16 +1623,15 @@
                     return `
                         <div class="option-group">
                             <h4>${step.name}</h4>
-                            <div class="radio-group">
+                            <div class="pill-group">
                                 ${step.options.map((option, optIndex) => `
-                                    <div class="radio-option">
-                                        <input type="radio" 
-                                               name="option_${actualStepIndex}" 
-                                               id="option_${actualStepIndex}_${optIndex}"
-                                               value="${optIndex}"
-                                               ${optIndex === 0 ? 'checked' : ''}>
-                                        <label for="option_${actualStepIndex}_${optIndex}">${option.name}</label>
-                                    </div>
+                                    <input type="radio"
+                                           class="pill-chip"
+                                           name="option_${actualStepIndex}"
+                                           id="option_${actualStepIndex}_${optIndex}"
+                                           value="${optIndex}"
+                                           ${optIndex === 0 ? 'checked' : ''}>
+                                    <label for="option_${actualStepIndex}_${optIndex}">${option.name}</label>
                                 `).join('')}
                             </div>
                         </div>
@@ -1330,7 +1647,6 @@
                 if (this.mode === 'forward') {
                     startTime = new Date(document.getElementById('startTime').value);
                 } else {
-                    // Backward mode - calculate from end time
                     const endTime = new Date(document.getElementById('endTime').value);
                     const totalDuration = this.calculateTotalDuration(recipe, startingStepIndex);
                     startTime = new Date(endTime - totalDuration);
@@ -1363,17 +1679,15 @@
                 // Calculate step times starting from selected step
                 let currentTime = new Date(startTime);
                 recipe.steps.forEach((step, index) => {
-                    // Mark previous steps as completed if starting mid-process
                     const isCompleted = index < startingStepIndex;
 
                     let duration;
 
-                    // Expandable steps (e.g., stretch & folds) get split into individual sub-steps
                     if (step.expandable && step.options) {
                         const selectedOptionIndex = selectedOptions[index] || 0;
                         const option = step.options[selectedOptionIndex];
                         const numSets = option.sets;
-                        const interval = step.foldInterval; // minutes between folds
+                        const interval = step.foldInterval;
 
                         for (let s = 1; s <= numSets; s++) {
                             bake.steps.push({
@@ -1391,7 +1705,6 @@
                     } else if (step.options) {
                         const selectedOptionIndex = selectedOptions[index] || 0;
                         const option = step.options[selectedOptionIndex];
-                        // Use option duration, but fall back to step duration if option is 0
                         duration = option.duration || step.duration || 0;
                         const unit = option.unit || step.unit;
 
@@ -1404,17 +1717,16 @@
                             completed: isCompleted,
                             selectedOption: option.name,
                             branch: option.branch,
-                            stepIndex: index
+                            stepIndex: index,
+                            postProofChoice: step.postProofChoice || false
                         });
 
-                        // Advance time
                         if (unit === 'hours') {
                             currentTime = new Date(currentTime.getTime() + duration * 3600000);
                         } else {
                             currentTime = new Date(currentTime.getTime() + duration * 60000);
                         }
                     } else {
-                        // Handle duration ranges
                         if (typeof step.duration === 'object' && step.duration.min) {
                             duration = (step.duration.min + step.duration.max) / 2;
                         } else {
@@ -1428,10 +1740,10 @@
                             unit: step.unit,
                             guidance: step.guidance,
                             completed: isCompleted,
-                            stepIndex: index
+                            stepIndex: index,
+                            postProofChoice: step.postProofChoice || false
                         });
 
-                        // Advance time
                         if (step.unit === 'hours') {
                             currentTime = new Date(currentTime.getTime() + duration * 60 * 60 * 1000);
                         } else {
@@ -1448,17 +1760,14 @@
             calculateTotalDuration(recipe, startingStepIndex = 0) {
                 let total = 0;
                 recipe.steps.forEach((step, index) => {
-                    // Skip steps before the starting step
                     if (index < startingStepIndex) return;
 
                     let duration;
 
                     if (step.expandable && step.options) {
-                        // Expandable steps: sets × interval
                         const numSets = step.options[0].sets;
                         total += numSets * step.foldInterval * 60 * 1000;
                     } else if (step.options) {
-                        // Use first option as default, fall back to step duration
                         duration = step.options[0].duration || step.duration || 0;
                         const unit = step.options[0].unit || step.unit;
                         if (unit === 'hours') {
@@ -1472,7 +1781,7 @@
                         } else {
                             duration = step.duration;
                         }
-                        
+
                         if (step.unit === 'hours') {
                             total += duration * 60 * 60 * 1000;
                         } else {
@@ -1486,15 +1795,15 @@
             renderIngredients(bake) {
                 const recipe = RECIPES[bake.recipeKey];
                 const container = document.getElementById('ingredientsSection');
-                
+
                 container.innerHTML = `
                     <h3>Ingredients Checklist</h3>
                     ${recipe.ingredients.map((ingredient, index) => {
                         const isChecked = bake.ingredientsChecked[index] || false;
                         return `
                             <div class="ingredient-item ${isChecked ? 'checked' : ''}">
-                                <input type="checkbox" 
-                                       id="ingredient_${index}" 
+                                <input type="checkbox"
+                                       id="ingredient_${index}"
                                        ${isChecked ? 'checked' : ''}
                                        onchange="app.toggleIngredient('${bake.id}', ${index})">
                                 <label for="ingredient_${index}">${ingredient}</label>
@@ -1522,27 +1831,35 @@
                     const recipeStep = recipe.steps[step.stepIndex];
                     const isCompleted = step.completed;
                     const isActive = index === currentStepIndex && !step.completed;
-                    const timeStr = step.time.toLocaleString();
+                    const timeStr = this.formatMilitaryDateTime(step.time);
                     const durationStr = step.duration > 0 ?
                         `${step.duration} ${step.unit}` :
                         'Ready';
 
+                    // Check if this is a post-proof choice step that needs user decision
+                    const needsPostProofChoice = step.postProofChoice && isActive && !step.postProofDecision && bake.recipeKey === 'pizza';
+
+                    // Check if this step is waiting for frozen dough thaw time
+                    const needsFrozenInput = step.waitingForFrozenInput && isActive;
+
                     return `
                         <div class="step-card ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}" id="step_${index}">
                             <div class="step-header">
-                                <div>
+                                <div style="flex: 1;">
                                     <div class="step-title">${step.name}</div>
-                                    ${step.selectedOption ? `<div style="color: #666; font-size: 0.9em;">${step.selectedOption}</div>` : ''}
+                                    ${step.selectedOption ? `<div style="color: #8E8E93; font-size: 13px;">${step.selectedOption}</div>` : ''}
                                 </div>
-                                <div class="step-time">${timeStr}</div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    ${step.guidance ? `
+                                        <button class="info-btn" onclick="app.toggleGuidance(${index})" id="infobtn_${index}">i</button>
+                                    ` : ''}
+                                    <div class="step-time">${timeStr}</div>
+                                </div>
                             </div>
                             <div class="step-duration">${durationStr}</div>
-                            
+
                             ${step.guidance ? `
                                 <div class="step-guidance">
-                                    <button class="guidance-toggle" onclick="app.toggleGuidance(${index})">
-                                        Show guidance ▼
-                                    </button>
                                     <div class="guidance-content hidden" id="guidance_${index}">
                                         ${step.guidance.visual ? `
                                             <strong>Visual cues:</strong>
@@ -1560,17 +1877,55 @@
                                 </div>
                             ` : ''}
 
-                            ${isActive && !isCompleted ? `
-                                <div class="step-actions">
-                                    <button class="btn btn-success" onclick="app.completeStep('${bake.id}', ${index})">
-                                        Mark Complete
-                                    </button>
-                                    ${recipeStep && recipeStep.options && !recipeStep.expandable ? `
+                            ${needsPostProofChoice ? `
+                                <div class="choice-cards">
+                                    <div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}', ${index}, 'today')">
+                                        <div class="choice-card-icon">🔥</div>
+                                        <div class="choice-card-text">
+                                            <h4>Continue baking</h4>
+                                            <p>Preheat oven and bake today</p>
+                                        </div>
+                                    </div>
+                                    <div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}', ${index}, 'refrigerate')">
+                                        <div class="choice-card-icon">❄️</div>
+                                        <div class="choice-card-text">
+                                            <h4>Refrigerate</h4>
+                                            <p>Store 24-48 hours for more flavor</p>
+                                        </div>
+                                    </div>
+                                    <div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}', ${index}, 'freeze')">
+                                        <div class="choice-card-icon">🧊</div>
+                                        <div class="choice-card-text">
+                                            <h4>Freeze</h4>
+                                            <p>Save for up to 2 months</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            ${needsFrozenInput ? `
+                                <div class="frozen-input-section">
+                                    <label>When did you pull the dough out of the freezer?</label>
+                                    <input type="datetime-local" id="frozenPullTime_${index}">
+                                    <button class="btn btn-success" onclick="app.setFrozenPullTime('${bake.id}', ${index})">Set Time & Continue</button>
+                                </div>
+                            ` : ''}
+
+                            ${isActive && !isCompleted && !needsPostProofChoice && !needsFrozenInput ? `
+                                <div class="step-toggle-row">
+                                    <span class="step-toggle-label">${isCompleted ? 'Completed' : 'Mark complete'}</span>
+                                    <label class="ios-toggle">
+                                        <input type="checkbox" ${isCompleted ? 'checked' : ''} onchange="app.completeStep('${bake.id}', ${index})">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                ${recipeStep && recipeStep.options && !recipeStep.expandable ? `
+                                    <div class="step-actions">
                                         <button class="btn btn-secondary" onclick="app.adjustStepOptions('${bake.id}', ${index})">
                                             Adjust Options
                                         </button>
-                                    ` : ''}
-                                </div>
+                                    </div>
+                                ` : ''}
                             ` : ''}
                         </div>
                     `;
@@ -1579,15 +1934,185 @@
 
             toggleGuidance(stepIndex) {
                 const content = document.getElementById(`guidance_${stepIndex}`);
-                const button = content.previousElementSibling;
-                
+                const infoBtn = document.getElementById(`infobtn_${stepIndex}`);
+
                 if (content.classList.contains('hidden')) {
                     content.classList.remove('hidden');
-                    button.textContent = 'Hide guidance ▲';
+                    infoBtn.classList.add('active');
                 } else {
                     content.classList.add('hidden');
-                    button.textContent = 'Show guidance ▼';
+                    infoBtn.classList.remove('active');
                 }
+            },
+
+            // Handle post-proof choice for pizza
+            handlePostProofChoice(bakeId, stepIndex, choice) {
+                const bake = this.activeBakes.find(b => b.id === bakeId);
+                if (!bake) return;
+
+                const recipe = RECIPES[bake.recipeKey];
+
+                // Mark the decision on the current step
+                bake.steps[stepIndex].postProofDecision = choice;
+
+                // Remove all steps after the current proof step
+                bake.steps = bake.steps.slice(0, stepIndex + 1);
+
+                const now = new Date();
+
+                // Add the appropriate branch steps
+                if (choice === 'today') {
+                    // Add baking steps
+                    const bakingSteps = recipe.steps.filter(s => s.branch === 'today');
+                    let currentTime = new Date(now);
+                    bakingSteps.forEach(step => {
+                        const duration = step.duration || 0;
+                        bake.steps.push({
+                            name: step.name,
+                            time: new Date(currentTime),
+                            duration: duration,
+                            unit: step.unit,
+                            guidance: step.guidance,
+                            completed: false,
+                            branch: 'today',
+                            stepIndex: recipe.steps.indexOf(step)
+                        });
+                        if (step.unit === 'hours') {
+                            currentTime = new Date(currentTime.getTime() + duration * 3600000);
+                        } else {
+                            currentTime = new Date(currentTime.getTime() + duration * 60000);
+                        }
+                    });
+                } else if (choice === 'refrigerate') {
+                    // Add refrigerate step, then baking steps
+                    const fridgeStep = recipe.steps.find(s => s.branch === 'refrigerate');
+                    let currentTime = new Date(now);
+                    bake.steps.push({
+                        name: fridgeStep.name,
+                        time: new Date(currentTime),
+                        duration: fridgeStep.duration,
+                        unit: fridgeStep.unit,
+                        guidance: fridgeStep.guidance,
+                        completed: false,
+                        branch: 'refrigerate',
+                        stepIndex: recipe.steps.indexOf(fridgeStep)
+                    });
+                    currentTime = new Date(currentTime.getTime() + fridgeStep.duration * 60000);
+
+                    // After fridge, add the today baking steps
+                    const bakingSteps = recipe.steps.filter(s => s.branch === 'today');
+                    bakingSteps.forEach(step => {
+                        const duration = step.duration || 0;
+                        bake.steps.push({
+                            name: step.name,
+                            time: new Date(currentTime),
+                            duration: duration,
+                            unit: step.unit,
+                            guidance: step.guidance,
+                            completed: false,
+                            branch: 'today',
+                            stepIndex: recipe.steps.indexOf(step)
+                        });
+                        if (step.unit === 'hours') {
+                            currentTime = new Date(currentTime.getTime() + duration * 3600000);
+                        } else {
+                            currentTime = new Date(currentTime.getTime() + duration * 60000);
+                        }
+                    });
+                } else if (choice === 'freeze') {
+                    // Add freeze step
+                    const freezeStep = recipe.steps.find(s => s.branch === 'freeze');
+                    bake.steps.push({
+                        name: freezeStep.name,
+                        time: new Date(now),
+                        duration: 0,
+                        unit: freezeStep.unit,
+                        guidance: freezeStep.guidance,
+                        completed: false,
+                        branch: 'freeze',
+                        stepIndex: recipe.steps.indexOf(freezeStep)
+                    });
+
+                    // Add a "Thaw & proof" step that waits for user input
+                    bake.steps.push({
+                        name: "Thaw & proof",
+                        time: new Date(now),
+                        duration: 180,
+                        unit: 'minutes',
+                        guidance: {
+                            visual: ["Thaw in fridge 12-24 hours", "Then proof at room temp 1-3 hours until puffy"],
+                            tips: ["Dough should be relaxed and stretchy before shaping"]
+                        },
+                        completed: false,
+                        branch: 'freeze',
+                        stepIndex: recipe.steps.indexOf(freezeStep),
+                        waitingForFrozenInput: true
+                    });
+
+                    // After thaw, add baking steps (times will be recalculated when user sets pull time)
+                    const bakingSteps = recipe.steps.filter(s => s.branch === 'today');
+                    let currentTime = new Date(now.getTime() + 180 * 60000); // placeholder
+                    bakingSteps.forEach(step => {
+                        const duration = step.duration || 0;
+                        bake.steps.push({
+                            name: step.name,
+                            time: new Date(currentTime),
+                            duration: duration,
+                            unit: step.unit,
+                            guidance: step.guidance,
+                            completed: false,
+                            branch: 'today',
+                            stepIndex: recipe.steps.indexOf(step)
+                        });
+                        if (step.unit === 'hours') {
+                            currentTime = new Date(currentTime.getTime() + duration * 3600000);
+                        } else {
+                            currentTime = new Date(currentTime.getTime() + duration * 60000);
+                        }
+                    });
+                }
+
+                this.saveActiveBakes();
+                this.renderTimelineSteps(bake);
+                this.updateGlobalTimerBanner();
+            },
+
+            // Set frozen pull time and recalculate subsequent steps
+            setFrozenPullTime(bakeId, stepIndex) {
+                const bake = this.activeBakes.find(b => b.id === bakeId);
+                if (!bake) return;
+
+                const pullTimeInput = document.getElementById(`frozenPullTime_${stepIndex}`);
+                if (!pullTimeInput || !pullTimeInput.value) {
+                    alert('Please select when you pulled the dough from the freezer.');
+                    return;
+                }
+
+                const pullTime = new Date(pullTimeInput.value);
+
+                // Thaw + proof is ~3 hours from pull time
+                const thawDuration = 180; // minutes
+                bake.steps[stepIndex].time = new Date(pullTime);
+                bake.steps[stepIndex].waitingForFrozenInput = false;
+
+                // Recalculate all steps after this one
+                let currentTime = new Date(pullTime.getTime() + thawDuration * 60000);
+                for (let i = stepIndex + 1; i < bake.steps.length; i++) {
+                    bake.steps[i].time = new Date(currentTime);
+                    bake.steps[i].notified = false;
+
+                    const duration = bake.steps[i].duration || 0;
+                    const unit = bake.steps[i].unit;
+                    if (unit === 'hours') {
+                        currentTime = new Date(currentTime.getTime() + duration * 3600000);
+                    } else {
+                        currentTime = new Date(currentTime.getTime() + duration * 60000);
+                    }
+                }
+
+                this.saveActiveBakes();
+                this.renderTimelineSteps(bake);
+                this.updateGlobalTimerBanner();
             },
 
             completeStep(bakeId, stepIndex) {
@@ -1650,13 +2175,12 @@
                 // Global mode: remove per-bake styling
                 document.getElementById('timerBanner').classList.remove('per-bake');
 
-                // Show banner if there are any active bakes
                 if (this.activeBakes.length === 0) {
                     document.getElementById('timerBanner').classList.add('hidden');
                     return;
                 }
 
-                // Find the most urgent active bake (closest upcoming step)
+                // Find the most urgent active bake
                 let mostUrgentBake = null;
                 let shortestTimeRemaining = Infinity;
                 const now = new Date();
@@ -1664,7 +2188,7 @@
                 this.activeBakes.forEach(bake => {
                     const currentStepIndex = this.getCurrentStepIndex(bake);
                     const currentStep = bake.steps[currentStepIndex];
-                    
+
                     if (!currentStep.completed) {
                         const timeRemaining = currentStep.time - now;
                         if (timeRemaining < shortestTimeRemaining) {
@@ -1688,7 +2212,6 @@
                 document.getElementById('bannerRecipeName').textContent = mostUrgentBake.recipeName;
                 document.getElementById('bannerCurrentStep').textContent = `${mostUrgentBake.recipeName} — ${currentStep.name}`;
 
-                // Calculate time remaining until end of current step
                 const nextStepIndex = currentStepIndex + 1;
                 let timeRemaining;
                 let totalStepDuration;
@@ -1699,7 +2222,6 @@
                     timeRemaining = stepEnd - now.getTime();
                     totalStepDuration = stepEnd - stepStart;
                 } else {
-                    // Last step: use its own duration
                     totalStepDuration = currentStep.duration * (currentStep.unit === 'hours' ? 3600000 : 60000);
                     timeRemaining = (currentStep.time.getTime() + totalStepDuration) - now.getTime();
                 }
@@ -1709,23 +2231,23 @@
                     progressFill.classList.remove('done');
                     progressFill.style.width = `${pct}%`;
                     document.getElementById('bannerTimeRemaining').textContent = this.formatTimeRemaining(timeRemaining);
-                    document.getElementById('bannerTimeRemaining').style.color = 'white';
+                    document.getElementById('bannerTimeRemaining').style.color = '#8E8E93';
                 } else if (!currentStep.completed) {
                     progressFill.classList.add('done');
                     progressFill.style.width = '0%';
-                    document.getElementById('bannerTimeRemaining').textContent = 'Ready now!';
-                    document.getElementById('bannerTimeRemaining').style.color = '#ffd700';
+                    document.getElementById('bannerTimeRemaining').textContent = 'Ready!';
+                    document.getElementById('bannerTimeRemaining').style.color = '#FFD60A';
                 } else {
                     progressFill.classList.add('done');
                     progressFill.style.width = '0%';
-                    document.getElementById('bannerTimeRemaining').textContent = 'Completed';
-                    document.getElementById('bannerTimeRemaining').style.color = '#90EE90';
+                    document.getElementById('bannerTimeRemaining').textContent = 'Done';
+                    document.getElementById('bannerTimeRemaining').style.color = '#30D158';
                 }
 
                 if (currentStepIndex < mostUrgentBake.steps.length - 1) {
                     const nextStep = mostUrgentBake.steps[currentStepIndex + 1];
                     document.getElementById('bannerNextStep').textContent =
-                        `Next: ${nextStep.name} at ${nextStep.time.toLocaleTimeString()}`;
+                        `Next: ${nextStep.name} at ${this.formatMilitaryTime(nextStep.time)}`;
                 } else {
                     document.getElementById('bannerNextStep').textContent = 'Final step!';
                 }
@@ -1745,14 +2267,13 @@
                 document.getElementById('bannerCurrentStep').textContent = currentStep.name;
 
                 if (currentStep.completed) {
-                    document.getElementById('bannerTimeRemaining').textContent = 'All steps complete!';
-                    document.getElementById('bannerTimeRemaining').style.color = '#90EE90';
+                    document.getElementById('bannerTimeRemaining').textContent = 'All done!';
+                    document.getElementById('bannerTimeRemaining').style.color = '#30D158';
                     progressFill.classList.add('done');
                     progressFill.style.width = '0%';
                 } else {
                     progressFill.classList.remove('done');
 
-                    // Countdown to end of current step (= start of next step)
                     const nextStepIndex = currentStepIndex + 1;
                     let countdownTarget;
                     let totalStepDuration;
@@ -1763,7 +2284,6 @@
                         countdownTarget = stepEnd - now.getTime();
                         totalStepDuration = stepEnd - stepStart;
                     } else {
-                        // Last step: count down its own duration from start time
                         totalStepDuration = currentStep.duration * (currentStep.unit === 'hours' ? 3600000 : 60000);
                         countdownTarget = (currentStep.time.getTime() + totalStepDuration) - now.getTime();
                     }
@@ -1772,20 +2292,19 @@
                         const pct = Math.max(0, Math.min(100, (countdownTarget / totalStepDuration) * 100));
                         progressFill.style.width = `${pct}%`;
                         document.getElementById('bannerTimeRemaining').textContent = this.formatTimeRemaining(countdownTarget);
-                        document.getElementById('bannerTimeRemaining').style.color = 'white';
+                        document.getElementById('bannerTimeRemaining').style.color = '#8E8E93';
                     } else {
                         progressFill.classList.add('done');
                         progressFill.style.width = '0%';
-                        document.getElementById('bannerTimeRemaining').textContent = 'Ready now!';
-                        document.getElementById('bannerTimeRemaining').style.color = '#ffd700';
+                        document.getElementById('bannerTimeRemaining').textContent = 'Ready!';
+                        document.getElementById('bannerTimeRemaining').style.color = '#FFD60A';
                     }
                 }
 
-                // Next step preview
                 if (currentStepIndex < bake.steps.length - 1) {
                     const nextStep = bake.steps[currentStepIndex + 1];
                     document.getElementById('bannerNextStep').textContent =
-                        `Next: ${nextStep.name} at ${nextStep.time.toLocaleTimeString()}`;
+                        `Next: ${nextStep.name} at ${this.formatMilitaryTime(nextStep.time)}`;
                 } else {
                     document.getElementById('bannerNextStep').textContent = 'Final step!';
                 }
@@ -1793,8 +2312,7 @@
 
             getNextActiveBakeId() {
                 if (this.activeBakes.length === 0) return null;
-                
-                // Return the most urgent bake's ID
+
                 const now = new Date();
                 let mostUrgentBake = this.activeBakes[0];
                 let shortestTimeRemaining = Infinity;
@@ -1802,7 +2320,7 @@
                 this.activeBakes.forEach(bake => {
                     const currentStepIndex = this.getCurrentStepIndex(bake);
                     const currentStep = bake.steps[currentStepIndex];
-                    
+
                     if (!currentStep.completed) {
                         const timeRemaining = currentStep.time - now;
                         if (timeRemaining < shortestTimeRemaining) {
@@ -1817,7 +2335,6 @@
 
             handleBannerClick() {
                 if (this.currentScreen === 'timelineView' && this.currentBakeId) {
-                    // Already viewing a bake — scroll to the active step
                     const bake = this.activeBakes.find(b => b.id === this.currentBakeId);
                     if (bake) {
                         const activeIndex = this.getCurrentStepIndex(bake);
@@ -1827,7 +2344,6 @@
                         }
                     }
                 } else {
-                    // On other screens — navigate to the most urgent bake
                     const bakeId = this.getNextActiveBakeId();
                     if (bakeId) {
                         this.showTimelineView(bakeId);
@@ -1848,31 +2364,25 @@
             },
 
             startTimerUpdates() {
-                // Request notification permission on first load
                 if ('Notification' in window && Notification.permission === 'default') {
                     Notification.requestPermission();
                 }
 
                 this.timerInterval = setInterval(() => {
-                    // Always update the global banner
                     this.updateGlobalTimerBanner();
-
-                    // Check all active bakes for notifications
                     this.checkForNotifications();
                 }, 1000);
             },
 
             checkForNotifications() {
                 const now = new Date();
-                
+
                 this.activeBakes.forEach(bake => {
                     bake.steps.forEach((step, index) => {
-                        // Skip if already completed or already notified
                         if (step.completed || step.notified) return;
 
                         const timeUntil = step.time - now;
-                        
-                        // If step time has passed, send notification
+
                         if (timeUntil <= 0) {
                             step.notified = true;
                             this.sendNotification(bake, step, index);
@@ -1883,10 +2393,9 @@
             },
 
             sendNotification(bake, step, stepIndex) {
-                // Browser notification
                 if ('Notification' in window && Notification.permission === 'granted') {
                     const nextStep = bake.steps[stepIndex + 1];
-                    const body = nextStep 
+                    const body = nextStep
                         ? `Time for: ${step.name}\nNext: ${nextStep.name}`
                         : `Time for: ${step.name}\nFinal step!`;
 
@@ -1905,12 +2414,34 @@
                     };
                 }
 
-                // Play sound alert
+                // Show in-app toast notification
+                this.showToast(bake.recipeName, step.name);
                 this.playAlert();
             },
 
+            showToast(title, stepName) {
+                // Remove existing toast
+                const existing = document.querySelector('.notification-toast');
+                if (existing) existing.remove();
+
+                const toast = document.createElement('div');
+                toast.className = 'notification-toast';
+                toast.innerHTML = `
+                    <div class="notification-toast-title">🍞 ${title}</div>
+                    <div class="notification-toast-body">Time for: ${stepName}</div>
+                `;
+                document.body.appendChild(toast);
+
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                    toast.style.animation = 'slideDown 0.3s reverse forwards';
+                    setTimeout(() => toast.remove(), 300);
+                }, 5000);
+
+                toast.onclick = () => toast.remove();
+            },
+
             playAlert() {
-                // Create a simple beep sound using Web Audio API
                 try {
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                     const oscillator = audioContext.createOscillator();
@@ -1942,7 +2473,6 @@
 
                 if (!step.options) return;
 
-                // Show options dialog
                 const currentOption = bake.selectedOptions[recipeStepIndex] || 0;
                 const optionsHtml = step.options.map((option, optIndex) => {
                     return `<option value="${optIndex}" ${optIndex === currentOption ? 'selected' : ''}>${option.name}</option>`;
@@ -1952,17 +2482,17 @@
                 modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);';
                 modal.innerHTML = `
                     <div style="background: #1C1C1E; padding: 24px; border-radius: 16px; max-width: 400px; width: 100%;">
-                        <h3 style="color: #ffffff; margin-bottom: 16px; font-size: 1.2em; font-weight: 700;">Adjust ${step.name}</h3>
-                        <select id="optionSelect" style="width: 100%; padding: 14px; background: #2C2C2E; border: none; border-radius: 12px; color: #FFFFFF; font-size: 1em; margin-bottom: 16px;">
+                        <h3 style="color: #ffffff; margin-bottom: 16px; font-size: 17px; font-weight: 700;">Adjust ${step.name}</h3>
+                        <select id="optionSelect" style="width: 100%; padding: 14px; background: #2C2C2E; border: none; border-radius: 12px; color: #FFFFFF; font-size: 17px; margin-bottom: 16px;">
                             ${optionsHtml}
                         </select>
                         <div style="display: flex; gap: 10px;">
-                            <button onclick="app.applyOptionChange('${bakeId}', ${bakeStepIndex})" style="flex: 1; background: #0A84FF; color: white; border: none; padding: 14px; border-radius: 12px; cursor: pointer; font-size: 1em; font-weight: 600;">Apply</button>
-                            <button onclick="app.closeModal()" style="flex: 1; background: #2C2C2E; color: white; border: none; padding: 14px; border-radius: 12px; cursor: pointer; font-size: 1em; font-weight: 600;">Cancel</button>
+                            <button onclick="app.applyOptionChange('${bakeId}', ${bakeStepIndex})" style="flex: 1; background: #0A84FF; color: white; border: none; padding: 14px; border-radius: 12px; cursor: pointer; font-size: 17px; font-weight: 600;">Apply</button>
+                            <button onclick="app.closeModal()" style="flex: 1; background: #2C2C2E; color: white; border: none; padding: 14px; border-radius: 12px; cursor: pointer; font-size: 17px; font-weight: 600;">Cancel</button>
                         </div>
                     </div>
                 `;
-                
+
                 document.body.appendChild(modal);
                 this.currentModal = modal;
             },
@@ -1977,16 +2507,13 @@
                 const recipeStep = recipe.steps[recipeStepIndex];
                 const newOption = recipeStep.options[newOptionIndex];
 
-                // Update the selected option
                 bake.selectedOptions[recipeStepIndex] = newOptionIndex;
 
-                // Update the bake step with new option
                 bake.steps[bakeStepIndex].duration = newOption.duration;
                 bake.steps[bakeStepIndex].unit = newOption.unit || recipeStep.unit;
                 bake.steps[bakeStepIndex].selectedOption = newOption.name;
                 bake.steps[bakeStepIndex].branch = newOption.branch;
 
-                // Recalculate times from this step forward through bake steps
                 let currentTime = new Date(bake.steps[bakeStepIndex].time);
                 for (let i = bakeStepIndex; i < bake.steps.length; i++) {
                     bake.steps[i].time = new Date(currentTime);
