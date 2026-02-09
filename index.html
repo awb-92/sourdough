@@ -486,11 +486,48 @@
             margin: 16px 0;
         }
 
-        .ingredients-section h3 {
-            color: #ffffff;
+        .ingredients-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 10px;
+        }
+
+        .ingredients-header h3 {
+            color: #ffffff;
             font-size: 17px;
             font-weight: 600;
+        }
+
+        .multiplier-control {
+            display: flex;
+            background: #2C2C2E;
+            border-radius: 8px;
+            padding: 2px;
+            gap: 0;
+        }
+
+        .multiplier-btn {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: #8E8E93;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.36, 0.66, 0.04, 1);
+            min-height: 28px;
+        }
+
+        .multiplier-btn.active {
+            background: #636366;
+            color: #FFFFFF;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .multiplier-btn:active {
+            transform: scale(0.92);
         }
 
         .ingredient-item {
@@ -1795,22 +1832,56 @@
             renderIngredients(bake) {
                 const recipe = RECIPES[bake.recipeKey];
                 const container = document.getElementById('ingredientsSection');
+                const multiplier = bake.ingredientMultiplier || 1;
 
                 container.innerHTML = `
-                    <h3>Ingredients Checklist</h3>
+                    <div class="ingredients-header">
+                        <h3>Ingredients</h3>
+                        <div class="multiplier-control">
+                            <button class="multiplier-btn ${multiplier === 1 ? 'active' : ''}" onclick="app.setMultiplier('${bake.id}', 1)">1x</button>
+                            <button class="multiplier-btn ${multiplier === 2 ? 'active' : ''}" onclick="app.setMultiplier('${bake.id}', 2)">2x</button>
+                            <button class="multiplier-btn ${multiplier === 3 ? 'active' : ''}" onclick="app.setMultiplier('${bake.id}', 3)">3x</button>
+                            <button class="multiplier-btn ${multiplier === 4 ? 'active' : ''}" onclick="app.setMultiplier('${bake.id}', 4)">4x</button>
+                        </div>
+                    </div>
                     ${recipe.ingredients.map((ingredient, index) => {
                         const isChecked = bake.ingredientsChecked[index] || false;
+                        const scaled = multiplier > 1 ? this.scaleIngredient(ingredient, multiplier) : ingredient;
                         return `
                             <div class="ingredient-item ${isChecked ? 'checked' : ''}">
                                 <input type="checkbox"
                                        id="ingredient_${index}"
                                        ${isChecked ? 'checked' : ''}
                                        onchange="app.toggleIngredient('${bake.id}', ${index})">
-                                <label for="ingredient_${index}">${ingredient}</label>
+                                <label for="ingredient_${index}">${scaled}</label>
                             </div>
                         `;
                     }).join('')}
                 `;
+            },
+
+            setMultiplier(bakeId, multiplier) {
+                const bake = this.activeBakes.find(b => b.id === bakeId);
+                if (!bake) return;
+                bake.ingredientMultiplier = multiplier;
+                this.saveActiveBakes();
+                this.renderIngredients(bake);
+            },
+
+            scaleIngredient(text, multiplier) {
+                // Scale all numbers in ingredient strings
+                // Handles: "150g", "2-3g", "87g water total", "1-2 cloves", "2.5-3.75g"
+                // Won't scale things inside parentheses like "(100% hydration)"
+                return text.replace(/(\([^)]*\))|(\d+\.?\d*)/g, (match, parenGroup, num) => {
+                    // Don't scale numbers inside parentheses
+                    if (parenGroup) return parenGroup;
+                    if (num) {
+                        const scaled = parseFloat(num) * multiplier;
+                        // Clean up: show integer if whole number, otherwise max 2 decimal places
+                        return scaled % 1 === 0 ? scaled.toString() : parseFloat(scaled.toFixed(2)).toString();
+                    }
+                    return match;
+                });
             },
 
             toggleIngredient(bakeId, ingredientIndex) {
