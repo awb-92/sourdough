@@ -172,6 +172,8 @@
         .ios-toggle input:checked + .slider { background: #30D158; }
         .ios-toggle input:checked + .slider::before { transform: translateX(20px); }
 
+        .start-timer-btn { margin-top: 12px; width: 100%; background: #0A84FF; color: white; border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; font-size: 15px; font-weight: 600; transition: transform 0.1s, opacity 0.15s; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 6px; touch-action: manipulation; }
+        .start-timer-btn:active { transform: scale(0.96); opacity: 0.7; }
         .step-actions { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
         .step-actions .btn { flex: 1; min-width: 130px; }
         .hidden { display: none; }
@@ -220,6 +222,7 @@
         .recipe-detail-step .step-meta { font-size: 13px; color: #8E8E93; margin-top: 2px; }
         .recipe-detail-branch-label { font-size: 13px; font-weight: 600; color: #0A84FF; text-transform: uppercase; letter-spacing: 0.04em; padding: 14px 0 4px; margin-top: 4px; }
         .recipe-detail-step .step-visual { font-size: 13px; color: #EBEBF5; margin-top: 4px; line-height: 1.5; }
+        .recipe-detail-step .step-visual ul { margin-left: 18px; }
         .recipe-detail-step .step-visual li { margin: 2px 0; }
         .recipe-detail-step .step-tips { font-size: 13px; color: #8E8E93; margin-top: 4px; line-height: 1.5; }
 
@@ -413,10 +416,11 @@
                     },
                     {
                         name: "Bulk fermentation",
-                        duration: { min: 3, max: 6, unit: "hours" },
+                        duration: 5, unit: "hours",
+                        bulkFermentChoice: true,
                         guidance: {
                             visual: ["Dough looks puffier and smoother", "Jiggly, with bubbles on sides/top", "Total rise roughly 30-70% (not necessarily doubled)"],
-                            tips: ["Very temperature dependent", "Avoid oven light if it overheats — find a reliably warm spot", "Visual cues more reliable than clock"]
+                            tips: ["5 hours typical, up to 8 hours is fine", "Very temperature dependent", "Avoid oven light if it overheats — find a reliably warm spot", "Visual cues more reliable than clock"]
                         }
                     },
                     {
@@ -1102,12 +1106,17 @@
                         bake.steps.push({
                             name: step.name, time: new Date(currentTime), duration, unit: step.unit || 'minutes',
                             guidance: step.guidance, completed: isCompleted, stepIndex: index,
-                            postProofChoice: step.postProofChoice || false
+                            postProofChoice: step.postProofChoice || false,
+                            bulkFermentChoice: step.bulkFermentChoice || false
                         });
                         const u = step.unit || 'minutes';
                         currentTime = new Date(currentTime.getTime() + duration * (u === 'hours' ? 3600000 : 60000));
                     }
                 });
+
+                // Auto-start the first uncompleted step
+                const firstActive = bake.steps.find(s => !s.completed);
+                if (firstActive) firstActive.started = true;
 
                 this.activeBakes.push(bake);
                 this.saveActiveBakes();
@@ -1177,6 +1186,7 @@
                 bake.ingredientMultiplier = m;
                 this.saveActiveBakes();
                 this.renderIngredients(bake);
+                this.renderTimelineSteps(bake);
             },
 
             scaleIng(text, mult) {
@@ -1211,7 +1221,17 @@
                     const timeStr = this.fmtDT(step.time);
                     const durStr = step.duration > 0 ? `${step.duration} ${step.unit}` : 'Ready';
                     const needsChoice = step.postProofChoice && isActive && !step.postProofDecision;
+                    const needsBulkChoice = step.bulkFermentChoice && isActive && !step.bulkFermentDecision;
                     const needsFrozen = step.waitingForFrozenInput && isActive;
+
+                    // Bulk fermentation choice (fridge vs room temp)
+                    let bulkChoiceHtml = '';
+                    if (needsBulkChoice) {
+                        bulkChoiceHtml = `<div class="choice-cards">
+                            <div class="choice-card" onclick="app.handleBulkFermentChoice('${bake.id}',${index},'room')"><div class="choice-card-icon">🌡️</div><div class="choice-card-text"><h4>Room temperature</h4><p>~5 hours (up to 8 hours is fine)</p></div></div>
+                            <div class="choice-card" onclick="app.handleBulkFermentChoice('${bake.id}',${index},'fridge')"><div class="choice-card-icon">❄️</div><div class="choice-card-text"><h4>In the fridge</h4><p>8-14 hours, slower rise, more flavor</p></div></div>
+                        </div>`;
+                    }
 
                     // Determine choice card content based on recipe
                     let choiceHtml = '';
@@ -1242,23 +1262,29 @@
                             </div>
                         </div>
                         <div class="step-duration">${durStr}</div>
-                        ${step.guidance ? `<div class="step-guidance"><div class="guidance-content hidden" id="guidance_${index}">
-                            ${step.guidance.visual ? `<strong>Visual cues:</strong><ul>${step.guidance.visual.map(c=>`<li>${c}</li>`).join('')}</ul>` : ''}
-                            ${step.guidance.tips ? `<strong>Tips:</strong><ul>${step.guidance.tips.map(t=>`<li>${t}</li>`).join('')}</ul>` : ''}
-                        </div></div>` : ''}
+                        ${step.guidance ? (() => {
+                            const m = bake.ingredientMultiplier || 1;
+                            const sc = (t) => m > 1 ? this.scaleIng(t, m) : t;
+                            return `<div class="step-guidance"><div class="guidance-content hidden" id="guidance_${index}">
+                            ${step.guidance.visual ? `<strong>Visual cues:</strong><ul>${step.guidance.visual.map(c=>`<li>${sc(c)}</li>`).join('')}</ul>` : ''}
+                            ${step.guidance.tips ? `<strong>Tips:</strong><ul>${step.guidance.tips.map(t=>`<li>${sc(t)}</li>`).join('')}</ul>` : ''}
+                        </div></div>`;
+                        })() : ''}
+                        ${bulkChoiceHtml}
                         ${choiceHtml}
                         ${needsFrozen ? `<div class="frozen-input-section">
                             <label>When did you pull the dough out of the freezer?</label>
                             <input type="datetime-local" id="frozenPullTime_${index}">
                             <button class="btn btn-success" onclick="app.setFrozenPullTime('${bake.id}',${index})">Set Time & Continue</button>
                         </div>` : ''}
-                        ${isActive && !isCompleted && !needsChoice && !needsFrozen ? `
-                            <div class="step-toggle-row">
+                        ${isActive && !isCompleted && !needsChoice && !needsFrozen && !needsBulkChoice ? (
+                            !step.started ? `<button class="start-timer-btn" onclick="app.startStep('${bake.id}',${index})">▶ Start Timer</button>` :
+                            `<div class="step-toggle-row">
                                 <span class="step-toggle-label">Mark complete</span>
                                 <label class="ios-toggle"><input type="checkbox" onchange="app.completeStep('${bake.id}',${index})"><span class="slider"></span></label>
                             </div>
-                            ${recipeStep && recipeStep.options && !recipeStep.expandable ? `<div class="step-actions"><button class="btn btn-secondary" onclick="app.adjustStepOptions('${bake.id}',${index})">Adjust Options</button></div>` : ''}
-                        ` : ''}
+                            ${recipeStep && recipeStep.options && !recipeStep.expandable ? `<div class="step-actions"><button class="btn btn-secondary" onclick="app.adjustStepOptions('${bake.id}',${index})">Adjust Options</button></div>` : ''}`
+                        ) : ''}
                     </div>`;
                 }).join('');
             },
@@ -1268,6 +1294,32 @@
                 const b = document.getElementById(`infobtn_${i}`);
                 c.classList.toggle('hidden');
                 b.classList.toggle('active');
+            },
+
+            handleBulkFermentChoice(bakeId, stepIndex, choice) {
+                const bake = this.activeBakes.find(b => b.id === bakeId);
+                if (!bake) return;
+                bake.steps[stepIndex].bulkFermentDecision = choice;
+                if (choice === 'fridge') {
+                    bake.steps[stepIndex].duration = 11;
+                    bake.steps[stepIndex].unit = 'hours';
+                    bake.steps[stepIndex].name = 'Bulk fermentation (fridge)';
+                } else {
+                    bake.steps[stepIndex].duration = 5;
+                    bake.steps[stepIndex].unit = 'hours';
+                    bake.steps[stepIndex].name = 'Bulk fermentation (room temp)';
+                }
+                // Recalculate subsequent step times
+                let ct = new Date(bake.steps[stepIndex].time);
+                for (let i = stepIndex; i < bake.steps.length; i++) {
+                    bake.steps[i].time = new Date(ct);
+                    bake.steps[i].notified = false;
+                    const d = bake.steps[i].duration || 0;
+                    ct = new Date(ct.getTime() + d * (bake.steps[i].unit === 'hours' ? 3600000 : 60000));
+                }
+                this.saveActiveBakes();
+                this.renderTimelineSteps(bake);
+                this.updateGlobalTimerBanner();
             },
 
             handlePostProofChoice(bakeId, stepIndex, choice) {
@@ -1364,6 +1416,25 @@
                 this.updateGlobalTimerBanner();
             },
 
+            startStep(bakeId, stepIndex) {
+                const bake = this.activeBakes.find(b => b.id === bakeId);
+                if (!bake) return;
+                const now = new Date();
+                bake.steps[stepIndex].started = true;
+                bake.steps[stepIndex].time = new Date(now);
+                // Recalculate subsequent step times from now
+                let ct = new Date(now);
+                for (let i = stepIndex; i < bake.steps.length; i++) {
+                    bake.steps[i].time = new Date(ct);
+                    bake.steps[i].notified = false;
+                    const d = bake.steps[i].duration || 0;
+                    ct = new Date(ct.getTime() + d * (bake.steps[i].unit === 'hours' ? 3600000 : 60000));
+                }
+                this.saveActiveBakes();
+                this.renderTimelineSteps(bake);
+                this.updateGlobalTimerBanner();
+            },
+
             completeStep(bakeId, stepIndex) {
                 const bake = this.activeBakes.find(b => b.id === bakeId);
                 if (!bake) return;
@@ -1420,28 +1491,34 @@
                 document.getElementById('bannerRecipeName').textContent = urgent.recipeName;
                 document.getElementById('bannerCurrentStep').textContent = `${urgent.recipeName} — ${cs.name}`;
 
-                const nsi = csi + 1;
-                let tr, tsd;
-                if (nsi < urgent.steps.length) {
-                    const se = urgent.steps[nsi].time.getTime(), ss = cs.time.getTime();
-                    tr = se - now.getTime(); tsd = se - ss;
-                } else {
-                    tsd = cs.duration * (cs.unit === 'hours' ? 3600000 : 60000);
-                    tr = (cs.time.getTime() + tsd) - now.getTime();
-                }
-
-                if (tr > 0 && tsd > 0) {
-                    pf.classList.remove('done'); pf.style.width = `${Math.max(0,Math.min(100,(tr/tsd)*100))}%`;
-                    document.getElementById('bannerTimeRemaining').textContent = this.fmtTR(tr);
+                if (!cs.started) {
+                    pf.classList.add('done'); pf.style.width = '100%';
+                    document.getElementById('bannerTimeRemaining').textContent = 'Not started';
                     document.getElementById('bannerTimeRemaining').style.color = '#8E8E93';
-                } else if (!cs.completed) {
-                    pf.classList.add('done'); pf.style.width = '0%';
-                    document.getElementById('bannerTimeRemaining').textContent = 'Ready!';
-                    document.getElementById('bannerTimeRemaining').style.color = '#FFD60A';
                 } else {
-                    pf.classList.add('done'); pf.style.width = '0%';
-                    document.getElementById('bannerTimeRemaining').textContent = 'Done';
-                    document.getElementById('bannerTimeRemaining').style.color = '#30D158';
+                    const nsi = csi + 1;
+                    let tr, tsd;
+                    if (nsi < urgent.steps.length) {
+                        const se = urgent.steps[nsi].time.getTime(), ss = cs.time.getTime();
+                        tr = se - now.getTime(); tsd = se - ss;
+                    } else {
+                        tsd = cs.duration * (cs.unit === 'hours' ? 3600000 : 60000);
+                        tr = (cs.time.getTime() + tsd) - now.getTime();
+                    }
+
+                    if (tr > 0 && tsd > 0) {
+                        pf.classList.remove('done'); pf.style.width = `${Math.max(0,Math.min(100,(tr/tsd)*100))}%`;
+                        document.getElementById('bannerTimeRemaining').textContent = this.fmtTR(tr);
+                        document.getElementById('bannerTimeRemaining').style.color = '#8E8E93';
+                    } else if (!cs.completed) {
+                        pf.classList.add('done'); pf.style.width = '0%';
+                        document.getElementById('bannerTimeRemaining').textContent = 'Ready!';
+                        document.getElementById('bannerTimeRemaining').style.color = '#FFD60A';
+                    } else {
+                        pf.classList.add('done'); pf.style.width = '0%';
+                        document.getElementById('bannerTimeRemaining').textContent = 'Done';
+                        document.getElementById('bannerTimeRemaining').style.color = '#30D158';
+                    }
                 }
 
                 if (csi < urgent.steps.length - 1) {
@@ -1467,6 +1544,10 @@
                     document.getElementById('bannerTimeRemaining').textContent = 'All done!';
                     document.getElementById('bannerTimeRemaining').style.color = '#30D158';
                     pf.classList.add('done'); pf.style.width = '0%';
+                } else if (!cs.started) {
+                    pf.classList.add('done'); pf.style.width = '100%';
+                    document.getElementById('bannerTimeRemaining').textContent = 'Not started';
+                    document.getElementById('bannerTimeRemaining').style.color = '#8E8E93';
                 } else {
                     pf.classList.remove('done');
                     const nsi = csi + 1;
@@ -1540,7 +1621,7 @@
                 const now = new Date();
                 this.activeBakes.forEach(bake => {
                     bake.steps.forEach((step, i) => {
-                        if (step.completed || step.notified) return;
+                        if (step.completed || step.notified || !step.started) return;
                         if (step.time - now <= 0) {
                             step.notified = true;
                             this.sendNotification(bake, step, i);
