@@ -125,8 +125,13 @@
 
         /* ─── Ingredients ─── */
         .ingredients-section { background: #1C1C1E; padding: 16px; border-radius: 16px; margin: 16px 0; }
-        .ingredients-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .ingredients-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .ingredients-header h3 { color: #fff; font-size: 17px; font-weight: 600; }
+        .ingredients-header .ing-toggle { display: flex; align-items: center; gap: 8px; }
+        .ingredients-header .ing-chevron { color: #8E8E93; font-size: 13px; transition: transform 0.25s; }
+        .ingredients-header .ing-chevron.collapsed { transform: rotate(-90deg); }
+        .ingredients-body { overflow: hidden; transition: max-height 0.3s cubic-bezier(0.36, 0.66, 0.04, 1); }
+        .ingredients-body.collapsed { max-height: 0 !important; }
         .multiplier-control { display: flex; background: #2C2C2E; border-radius: 8px; padding: 2px; }
         .multiplier-btn { padding: 4px 10px; border: none; border-radius: 6px; background: transparent; color: #8E8E93; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; min-height: 28px; }
         .multiplier-btn.active { background: #636366; color: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
@@ -226,6 +231,47 @@
         .recipe-detail-step .step-visual li { margin: 2px 0; }
         .recipe-detail-step .step-tips { font-size: 13px; color: #8E8E93; margin-top: 4px; line-height: 1.5; }
 
+        /* ─── Completed Steps Collapse ─── */
+        .completed-steps-header { background: #1C1C1E; padding: 14px 16px; border-radius: 14px; margin: 10px 0; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: opacity 0.15s; opacity: 0.5; }
+        .completed-steps-header:active { opacity: 0.3; }
+        .completed-steps-header span { color: #8E8E93; font-size: 15px; font-weight: 500; }
+        .completed-steps-header .csh-chevron { color: #8E8E93; font-size: 13px; transition: transform 0.25s; }
+        .completed-steps-header .csh-chevron.open { transform: rotate(90deg); }
+
+        /* ─── Bake Notes ─── */
+        .bake-notes-section { background: #1C1C1E; padding: 16px; border-radius: 16px; margin: 16px 0; }
+        .bake-notes-section h3 { color: #fff; font-size: 17px; font-weight: 600; margin-bottom: 10px; }
+        .bake-note-entry { padding: 10px 0; border-bottom: 0.5px solid rgba(60,60,67,0.36); }
+        .bake-note-entry:last-child { border-bottom: none; }
+        .bake-note-entry .note-time { font-size: 11px; color: #8E8E93; margin-bottom: 2px; }
+        .bake-note-entry .note-text { font-size: 15px; color: #EBEBF5; line-height: 1.4; }
+        .bake-note-entry .note-photo { max-width: 100%; border-radius: 10px; margin-top: 6px; }
+        .note-input-row { display: flex; gap: 8px; margin-top: 10px; }
+        .note-input-row input[type="text"] { flex: 1; padding: 10px 14px; background: #2C2C2E; border: none; border-radius: 10px; color: #fff; font-size: 15px; font-family: inherit; min-height: 40px; }
+        .note-input-row input[type="text"]:focus { outline: 2px solid #0A84FF; outline-offset: -2px; }
+        .note-input-row button { min-width: 40px; height: 40px; border-radius: 10px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .note-input-row .note-add-btn { background: #0A84FF; color: white; }
+        .note-input-row .note-photo-btn { background: #2C2C2E; color: #8E8E93; font-size: 16px; }
+
+        /* ─── History Tab ─── */
+        .history-card { background: #1C1C1E; border-radius: 16px; padding: 16px; margin-bottom: 24px; }
+        .history-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
+        .history-item { padding: 12px 0; border-bottom: 0.5px solid rgba(60,60,67,0.36); cursor: pointer; transition: opacity 0.15s; }
+        .history-item:last-of-type { border-bottom: none; }
+        .history-item:active { opacity: 0.6; }
+        .history-item h4 { font-size: 17px; font-weight: 600; color: #fff; }
+        .history-item p { font-size: 13px; color: #8E8E93; margin-top: 2px; }
+        .history-empty { color: #8E8E93; font-size: 15px; text-align: center; padding: 20px; }
+
+        /* ─── Recipe Reference Dropdown ─── */
+        .recipe-ref-section { background: #1C1C1E; padding: 16px; border-radius: 16px; margin: 16px 0; }
+        .recipe-ref-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+        .recipe-ref-header h3 { color: #fff; font-size: 17px; font-weight: 600; }
+        .recipe-ref-header .ref-chevron { color: #8E8E93; font-size: 13px; transition: transform 0.25s; }
+        .recipe-ref-header .ref-chevron.open { transform: rotate(90deg); }
+        .recipe-ref-body { overflow: hidden; max-height: 0; transition: max-height 0.35s cubic-bezier(0.36, 0.66, 0.04, 1); }
+        .recipe-ref-body.open { max-height: 3000px; }
+
         /* ─── Add Recipe Form ─── */
         .add-step-card { background: #2C2C2E; border-radius: 12px; padding: 14px; margin-bottom: 10px; }
         .add-step-card .form-group { margin: 8px 0; }
@@ -269,6 +315,7 @@
                 <div id="activeBakesList"></div>
             </div>
             <div id="recipeBookCard" class="recipe-book-card"></div>
+            <div id="historyCard" class="history-card hidden"></div>
             <div id="notificationStatus" class="notification-status hidden">
                 <p>Enable notifications to get alerts when steps are ready</p>
                 <button class="btn btn-secondary" onclick="app.requestNotificationPermission()">Enable Notifications</button>
@@ -327,6 +374,8 @@
             <div class="timeline-view">
                 <div id="ingredientsSection" class="ingredients-section"></div>
                 <div id="timelineSteps"></div>
+                <div id="bakeNotesSection" class="bake-notes-section"></div>
+                <div id="recipeRefSection" class="recipe-ref-section"></div>
             </div>
         </div>
 
@@ -337,6 +386,15 @@
                 <h2 id="recipeDetailName"></h2>
             </div>
             <div id="recipeDetailContent"></div>
+        </div>
+
+        <!-- History Detail View -->
+        <div id="historyDetailView" class="hidden">
+            <div class="screen-header">
+                <button class="back-btn" onclick="app.showMainScreen()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                <h2 id="historyDetailName"></h2>
+            </div>
+            <div id="historyDetailContent"></div>
         </div>
 
         <!-- Add Recipe Screen -->
@@ -380,6 +438,7 @@
                     {
                         name: "Mix",
                         duration: 5, unit: "minutes",
+                        noTimer: true, noNotification: true, autoStartNext: true,
                         guidance: {
                             visual: ["Mix 350g water + 100g starter until cloudy", "Add 500g flour, mix until no dry flour remains", "Cover"],
                             tips: ["If dough feels stiff, hold back 10-25g water and add only if needed"]
@@ -396,6 +455,7 @@
                     {
                         name: "Add salt",
                         duration: 3, unit: "minutes",
+                        noTimer: true,
                         guidance: {
                             visual: ["Sprinkle in 10g salt", "Pinch/fold until incorporated"],
                             tips: ["If dough feels stiff, wet your hand and add a splash of held-back water"]
@@ -656,12 +716,17 @@
             currentBakeId: null,
             timerInterval: null,
             newStepCount: 0,
+            bakeHistory: [],
+            ingredientsCollapsed: {},
+            completedStepsExpanded: {},
 
             init() {
                 this.loadActiveBakes();
                 this.loadCustomRecipes();
+                this.loadBakeHistory();
                 this.renderActiveBakes();
                 this.renderRecipeBook();
+                this.renderHistory();
                 this.setDefaultStartTime();
                 this.startTimerUpdates();
                 this.checkNotificationPermission();
@@ -678,6 +743,15 @@
 
             saveCustomRecipes() {
                 localStorage.setItem('customRecipes', JSON.stringify(this.customRecipes));
+            },
+
+            loadBakeHistory() {
+                const saved = localStorage.getItem('bakeHistory');
+                if (saved) this.bakeHistory = JSON.parse(saved);
+            },
+
+            saveBakeHistory() {
+                localStorage.setItem('bakeHistory', JSON.stringify(this.bakeHistory));
             },
 
             checkNotificationPermission() {
@@ -745,7 +819,7 @@
             },
 
             hideAllScreens() {
-                ['mainScreen', 'recipeSelection', 'timelineSetup', 'timelineView', 'recipeDetailView', 'addRecipeScreen'].forEach(id => {
+                ['mainScreen', 'recipeSelection', 'timelineSetup', 'timelineView', 'recipeDetailView', 'historyDetailView', 'addRecipeScreen'].forEach(id => {
                     const el = document.getElementById(id);
                     el.classList.add('hidden');
                     el.classList.remove('screen-enter');
@@ -757,6 +831,7 @@
                 document.getElementById('mainScreen').classList.remove('hidden');
                 this.renderActiveBakes();
                 this.renderRecipeBook();
+                this.renderHistory();
                 this.updateGlobalTimerBanner();
                 this.currentScreen = 'main';
             },
@@ -1051,6 +1126,7 @@
                     mode: this.mode,
                     selectedOptions,
                     ingredientsChecked: {},
+                    notes: [],
                     steps: [],
                     currentStepIndex: 0,
                     startingStepIndex
@@ -1107,7 +1183,10 @@
                             name: step.name, time: new Date(currentTime), duration, unit: step.unit || 'minutes',
                             guidance: step.guidance, completed: isCompleted, stepIndex: index,
                             postProofChoice: step.postProofChoice || false,
-                            bulkFermentChoice: step.bulkFermentChoice || false
+                            bulkFermentChoice: step.bulkFermentChoice || false,
+                            noTimer: step.noTimer || false,
+                            noNotification: step.noNotification || false,
+                            autoStartNext: step.autoStartNext || false
                         });
                         const u = step.unit || 'minutes';
                         currentTime = new Date(currentTime.getTime() + duration * (u === 'hours' ? 3600000 : 60000));
@@ -1158,26 +1237,45 @@
                 if (!recipe) return;
                 const container = document.getElementById('ingredientsSection');
                 const mult = bake.ingredientMultiplier || 1;
+                const allChecked = recipe.ingredients.every((_, i) => bake.ingredientsChecked[i]);
+                // Auto-collapse when all checked, remember manual toggle
+                const isCollapsed = this.ingredientsCollapsed[bake.id] !== undefined
+                    ? this.ingredientsCollapsed[bake.id]
+                    : allChecked;
+                const checkedCount = recipe.ingredients.filter((_, i) => bake.ingredientsChecked[i]).length;
 
                 let noteHtml = '';
                 if (recipe.note) noteHtml = `<div style="font-size:13px;color:#8E8E93;padding:8px 0;border-top:0.5px solid rgba(60,60,67,0.36);margin-top:4px;">${recipe.note}</div>`;
 
                 container.innerHTML = `
-                    <div class="ingredients-header"><h3>Ingredients</h3>
-                        <div class="multiplier-control">
-                            ${[1,2,3,4].map(m => `<button class="multiplier-btn ${mult===m?'active':''}" onclick="app.setMultiplier('${bake.id}',${m})">${m}x</button>`).join('')}
+                    <div class="ingredients-header" onclick="app.toggleIngredientsCollapse('${bake.id}')">
+                        <h3>Ingredients <span style="color:#8E8E93;font-size:13px;font-weight:400">(${checkedCount}/${recipe.ingredients.length})</span></h3>
+                        <div class="ing-toggle">
+                            <div class="multiplier-control" onclick="event.stopPropagation()">
+                                ${[1,2,3,4].map(m => `<button class="multiplier-btn ${mult===m?'active':''}" onclick="event.stopPropagation();app.setMultiplier('${bake.id}',${m})">${m}x</button>`).join('')}
+                            </div>
+                            <span class="ing-chevron ${isCollapsed?'collapsed':''}">▼</span>
                         </div>
                     </div>
-                    ${recipe.ingredients.map((ing, i) => {
-                        const checked = bake.ingredientsChecked[i] || false;
-                        const scaled = mult > 1 ? this.scaleIng(ing, mult) : ing;
-                        return `<div class="ingredient-item ${checked?'checked':''}">
-                            <input type="checkbox" id="ing_${i}" ${checked?'checked':''} onchange="app.toggleIng('${bake.id}',${i})">
-                            <label for="ing_${i}">${scaled}</label>
-                        </div>`;
-                    }).join('')}
-                    ${noteHtml}
+                    <div class="ingredients-body ${isCollapsed?'collapsed':''}" style="max-height:${isCollapsed?'0':'2000px'}">
+                        ${recipe.ingredients.map((ing, i) => {
+                            const checked = bake.ingredientsChecked[i] || false;
+                            const scaled = mult > 1 ? this.scaleIng(ing, mult) : ing;
+                            return `<div class="ingredient-item ${checked?'checked':''}">
+                                <input type="checkbox" id="ing_${i}" ${checked?'checked':''} onchange="app.toggleIng('${bake.id}',${i})">
+                                <label for="ing_${i}">${scaled}</label>
+                            </div>`;
+                        }).join('')}
+                        ${noteHtml}
+                    </div>
                 `;
+            },
+
+            toggleIngredientsCollapse(bakeId) {
+                const current = this.ingredientsCollapsed[bakeId];
+                this.ingredientsCollapsed[bakeId] = current === undefined ? true : !current;
+                const bake = this.activeBakes.find(b => b.id === bakeId);
+                if (bake) this.renderIngredients(bake);
             },
 
             setMultiplier(bakeId, m) {
@@ -1204,6 +1302,12 @@
                 const bake = this.activeBakes.find(b => b.id === bakeId);
                 if (!bake) return;
                 bake.ingredientsChecked[idx] = !bake.ingredientsChecked[idx];
+                // Auto-collapse when all checked
+                const recipes = this.getRecipes();
+                const recipe = recipes[bake.recipeKey];
+                if (recipe && recipe.ingredients.every((_, i) => bake.ingredientsChecked[i])) {
+                    this.ingredientsCollapsed[bakeId] = true;
+                }
                 this.saveActiveBakes();
                 this.renderIngredients(bake);
             },
@@ -1214,79 +1318,131 @@
                 const recipes = this.getRecipes();
                 const recipe = recipes[bake.recipeKey];
 
-                container.innerHTML = '<h3>Timeline</h3>' + bake.steps.map((step, index) => {
-                    const recipeStep = recipe ? recipe.steps[step.stepIndex] : null;
-                    const isCompleted = step.completed;
-                    const isActive = index === csi && !step.completed;
-                    const timeStr = this.fmtDT(step.time);
-                    const durStr = step.duration > 0 ? `${step.duration} ${step.unit}` : 'Ready';
-                    const needsChoice = step.postProofChoice && isActive && !step.postProofDecision;
-                    const needsBulkChoice = step.bulkFermentChoice && isActive && !step.bulkFermentDecision;
-                    const needsFrozen = step.waitingForFrozenInput && isActive;
+                // Separate completed and remaining steps
+                const completedSteps = [];
+                const remainingSteps = [];
+                bake.steps.forEach((step, index) => {
+                    if (step.completed && index < csi) completedSteps.push({ step, index });
+                    else remainingSteps.push({ step, index });
+                });
 
-                    // Bulk fermentation choice (fridge vs room temp)
-                    let bulkChoiceHtml = '';
-                    if (needsBulkChoice) {
-                        bulkChoiceHtml = `<div class="choice-cards">
-                            <div class="choice-card" onclick="app.handleBulkFermentChoice('${bake.id}',${index},'room')"><div class="choice-card-icon">🌡️</div><div class="choice-card-text"><h4>Room temperature</h4><p>~5 hours (up to 8 hours is fine)</p></div></div>
-                            <div class="choice-card" onclick="app.handleBulkFermentChoice('${bake.id}',${index},'fridge')"><div class="choice-card-icon">❄️</div><div class="choice-card-text"><h4>In the fridge</h4><p>8-14 hours, slower rise, more flavor</p></div></div>
+                let html = '<h3>Timeline</h3>';
+
+                // Completed steps collapse header
+                if (completedSteps.length > 0) {
+                    const isExpanded = this.completedStepsExpanded[bake.id] || false;
+                    html += `<div class="completed-steps-header" onclick="app.toggleCompletedSteps('${bake.id}')">
+                        <span>${completedSteps.length} completed step${completedSteps.length > 1 ? 's' : ''}</span>
+                        <span class="csh-chevron ${isExpanded?'open':''}">›</span>
+                    </div>`;
+                    if (isExpanded) {
+                        completedSteps.forEach(({ step, index }) => {
+                            html += this.renderStepCard(bake, step, index, csi, recipe);
+                        });
+                    }
+                }
+
+                // Remaining steps (active + upcoming)
+                remainingSteps.forEach(({ step, index }) => {
+                    html += this.renderStepCard(bake, step, index, csi, recipe);
+                });
+
+                container.innerHTML = html;
+
+                // Also render notes and recipe reference
+                this.renderBakeNotes(bake);
+                this.renderRecipeReference(bake);
+            },
+
+            toggleCompletedSteps(bakeId) {
+                this.completedStepsExpanded[bakeId] = !this.completedStepsExpanded[bakeId];
+                const bake = this.activeBakes.find(b => b.id === bakeId);
+                if (bake) this.renderTimelineSteps(bake);
+            },
+
+            renderStepCard(bake, step, index, csi, recipe) {
+                const recipeStep = recipe ? recipe.steps[step.stepIndex] : null;
+                const isCompleted = step.completed;
+                const isActive = index === csi && !step.completed;
+                const timeStr = this.fmtDT(step.time);
+                const isNoTimer = step.noTimer;
+                const durStr = isNoTimer ? 'No timer' : (step.duration > 0 ? `${step.duration} ${step.unit}` : 'Ready');
+                const needsChoice = step.postProofChoice && isActive && !step.postProofDecision;
+                const needsBulkChoice = step.bulkFermentChoice && isActive && !step.bulkFermentDecision;
+                const needsFrozen = step.waitingForFrozenInput && isActive;
+
+                let bulkChoiceHtml = '';
+                if (needsBulkChoice) {
+                    bulkChoiceHtml = `<div class="choice-cards">
+                        <div class="choice-card" onclick="app.handleBulkFermentChoice('${bake.id}',${index},'room')"><div class="choice-card-icon">🌡️</div><div class="choice-card-text"><h4>Room temperature</h4><p>~5 hours (up to 8 hours is fine)</p></div></div>
+                        <div class="choice-card" onclick="app.handleBulkFermentChoice('${bake.id}',${index},'fridge')"><div class="choice-card-icon">❄️</div><div class="choice-card-text"><h4>In the fridge</h4><p>8-14 hours, slower rise, more flavor</p></div></div>
+                    </div>`;
+                }
+
+                let choiceHtml = '';
+                if (needsChoice) {
+                    if (bake.recipeKey === 'pizza') {
+                        choiceHtml = `<div class="choice-cards">
+                            <div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}',${index},'today')"><div class="choice-card-icon">🔥</div><div class="choice-card-text"><h4>Continue baking</h4><p>Preheat oven and bake today</p></div></div>
+                            <div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}',${index},'refrigerate')"><div class="choice-card-icon">❄️</div><div class="choice-card-text"><h4>Refrigerate</h4><p>Store 24-48 hours for more flavor</p></div></div>
+                            <div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}',${index},'freeze')"><div class="choice-card-icon">🧊</div><div class="choice-card-text"><h4>Freeze</h4><p>Save for up to 2 months</p></div></div>
+                        </div>`;
+                    } else if (bake.recipeKey === 'sourdough') {
+                        choiceHtml = `<div class="choice-cards">
+                            <div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}',${index},'today')"><div class="choice-card-icon">🔥</div><div class="choice-card-text"><h4>Room temp proof</h4><p>1-2.5 hours, proof until poke test passes</p></div></div>
+                            <div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}',${index},'cold')"><div class="choice-card-icon">❄️</div><div class="choice-card-text"><h4>Cold proof</h4><p>8-16 hours in fridge, better flavor + easier scoring</p></div></div>
                         </div>`;
                     }
+                }
 
-                    // Determine choice card content based on recipe
-                    let choiceHtml = '';
-                    if (needsChoice) {
-                        if (bake.recipeKey === 'pizza') {
-                            choiceHtml = `<div class="choice-cards">
-                                <div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}',${index},'today')"><div class="choice-card-icon">🔥</div><div class="choice-card-text"><h4>Continue baking</h4><p>Preheat oven and bake today</p></div></div>
-                                <div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}',${index},'refrigerate')"><div class="choice-card-icon">❄️</div><div class="choice-card-text"><h4>Refrigerate</h4><p>Store 24-48 hours for more flavor</p></div></div>
-                                <div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}',${index},'freeze')"><div class="choice-card-icon">🧊</div><div class="choice-card-text"><h4>Freeze</h4><p>Save for up to 2 months</p></div></div>
-                            </div>`;
-                        } else if (bake.recipeKey === 'sourdough') {
-                            choiceHtml = `<div class="choice-cards">
-                                <div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}',${index},'today')"><div class="choice-card-icon">🔥</div><div class="choice-card-text"><h4>Room temp proof</h4><p>1-2.5 hours, proof until poke test passes</p></div></div>
-                                <div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}',${index},'cold')"><div class="choice-card-icon">❄️</div><div class="choice-card-text"><h4>Cold proof</h4><p>8-16 hours in fridge, better flavor + easier scoring</p></div></div>
-                            </div>`;
-                        }
-                    }
-
-                    return `<div class="step-card ${isCompleted?'completed':''} ${isActive?'active':''}" id="step_${index}">
-                        <div class="step-header">
-                            <div style="flex:1">
-                                <div class="step-title">${step.name}</div>
-                                ${step.selectedOption ? `<div style="color:#8E8E93;font-size:13px">${step.selectedOption}</div>` : ''}
-                            </div>
-                            <div style="display:flex;align-items:center;gap:8px">
-                                ${step.guidance ? `<button class="info-btn" onclick="app.toggleGuidance(${index})" id="infobtn_${index}">i</button>` : ''}
-                                <div class="step-time">${timeStr}</div>
-                            </div>
+                // For noTimer steps: show mark complete directly (no start timer button needed)
+                let actionHtml = '';
+                if (isActive && !isCompleted && !needsChoice && !needsFrozen && !needsBulkChoice) {
+                    if (isNoTimer) {
+                        actionHtml = `<div class="step-toggle-row">
+                            <span class="step-toggle-label">Mark complete</span>
+                            <label class="ios-toggle"><input type="checkbox" onchange="app.completeStep('${bake.id}',${index})"><span class="slider"></span></label>
+                        </div>`;
+                    } else if (!step.started) {
+                        actionHtml = `<button class="start-timer-btn" onclick="app.startStep('${bake.id}',${index})">▶ Start Timer</button>`;
+                    } else {
+                        actionHtml = `<div class="step-toggle-row">
+                            <span class="step-toggle-label">Mark complete</span>
+                            <label class="ios-toggle"><input type="checkbox" onchange="app.completeStep('${bake.id}',${index})"><span class="slider"></span></label>
                         </div>
-                        <div class="step-duration">${durStr}</div>
-                        ${step.guidance ? (() => {
-                            const m = bake.ingredientMultiplier || 1;
-                            const sc = (t) => m > 1 ? this.scaleIng(t, m) : t;
-                            return `<div class="step-guidance"><div class="guidance-content hidden" id="guidance_${index}">
-                            ${step.guidance.visual ? `<strong>Visual cues:</strong><ul>${step.guidance.visual.map(c=>`<li>${sc(c)}</li>`).join('')}</ul>` : ''}
-                            ${step.guidance.tips ? `<strong>Tips:</strong><ul>${step.guidance.tips.map(t=>`<li>${sc(t)}</li>`).join('')}</ul>` : ''}
-                        </div></div>`;
-                        })() : ''}
-                        ${bulkChoiceHtml}
-                        ${choiceHtml}
-                        ${needsFrozen ? `<div class="frozen-input-section">
-                            <label>When did you pull the dough out of the freezer?</label>
-                            <input type="datetime-local" id="frozenPullTime_${index}">
-                            <button class="btn btn-success" onclick="app.setFrozenPullTime('${bake.id}',${index})">Set Time & Continue</button>
-                        </div>` : ''}
-                        ${isActive && !isCompleted && !needsChoice && !needsFrozen && !needsBulkChoice ? (
-                            !step.started ? `<button class="start-timer-btn" onclick="app.startStep('${bake.id}',${index})">▶ Start Timer</button>` :
-                            `<div class="step-toggle-row">
-                                <span class="step-toggle-label">Mark complete</span>
-                                <label class="ios-toggle"><input type="checkbox" onchange="app.completeStep('${bake.id}',${index})"><span class="slider"></span></label>
-                            </div>
-                            ${recipeStep && recipeStep.options && !recipeStep.expandable ? `<div class="step-actions"><button class="btn btn-secondary" onclick="app.adjustStepOptions('${bake.id}',${index})">Adjust Options</button></div>` : ''}`
-                        ) : ''}
-                    </div>`;
-                }).join('');
+                        ${recipeStep && recipeStep.options && !recipeStep.expandable ? `<div class="step-actions"><button class="btn btn-secondary" onclick="app.adjustStepOptions('${bake.id}',${index})">Adjust Options</button></div>` : ''}`;
+                    }
+                }
+
+                return `<div class="step-card ${isCompleted?'completed':''} ${isActive?'active':''}" id="step_${index}">
+                    <div class="step-header">
+                        <div style="flex:1">
+                            <div class="step-title">${step.name}</div>
+                            ${step.selectedOption ? `<div style="color:#8E8E93;font-size:13px">${step.selectedOption}</div>` : ''}
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px">
+                            ${step.guidance ? `<button class="info-btn" onclick="app.toggleGuidance(${index})" id="infobtn_${index}">i</button>` : ''}
+                            <div class="step-time">${timeStr}</div>
+                        </div>
+                    </div>
+                    <div class="step-duration">${durStr}</div>
+                    ${step.guidance ? (() => {
+                        const m = bake.ingredientMultiplier || 1;
+                        const sc = (t) => m > 1 ? this.scaleIng(t, m) : t;
+                        return `<div class="step-guidance"><div class="guidance-content hidden" id="guidance_${index}">
+                        ${step.guidance.visual ? `<strong>Visual cues:</strong><ul>${step.guidance.visual.map(c=>`<li>${sc(c)}</li>`).join('')}</ul>` : ''}
+                        ${step.guidance.tips ? `<strong>Tips:</strong><ul>${step.guidance.tips.map(t=>`<li>${sc(t)}</li>`).join('')}</ul>` : ''}
+                    </div></div>`;
+                    })() : ''}
+                    ${bulkChoiceHtml}
+                    ${choiceHtml}
+                    ${needsFrozen ? `<div class="frozen-input-section">
+                        <label>When did you pull the dough out of the freezer?</label>
+                        <input type="datetime-local" id="frozenPullTime_${index}">
+                        <button class="btn btn-success" onclick="app.setFrozenPullTime('${bake.id}',${index})">Set Time & Continue</button>
+                    </div>` : ''}
+                    ${actionHtml}
+                </div>`;
             },
 
             toggleGuidance(i) {
@@ -1442,12 +1598,17 @@
                 bake.steps[stepIndex].completed = true;
                 bake.steps[stepIndex].completedAt = now;
                 bake.currentStepIndex = stepIndex + 1;
+                // If this step has autoStartNext, auto-start the next step's timer
+                const autoNext = bake.steps[stepIndex].autoStartNext;
                 let ct = new Date(now);
                 for (let i = stepIndex + 1; i < bake.steps.length; i++) {
                     bake.steps[i].time = new Date(ct);
                     bake.steps[i].notified = false;
                     const d = bake.steps[i].duration || 0;
                     ct = new Date(ct.getTime() + d * (bake.steps[i].unit === 'hours' ? 3600000 : 60000));
+                }
+                if (autoNext && bake.steps[stepIndex + 1] && !bake.steps[stepIndex + 1].completed) {
+                    bake.steps[stepIndex + 1].started = true;
                 }
                 this.saveActiveBakes();
                 this.renderTimelineSteps(bake);
@@ -1614,14 +1775,53 @@
                 this.timerInterval = setInterval(() => {
                     this.updateGlobalTimerBanner();
                     this.checkForNotifications();
+                    this.updateLiveNotification();
                 }, 1000);
+            },
+
+            updateLiveNotification() {
+                if (!('Notification' in window) || Notification.permission !== 'granted') return;
+                if (this.activeBakes.length === 0) return;
+                // Find most urgent active step with a running timer
+                let urgentBake = null, urgentStep = null, urgentIdx = -1, shortest = Infinity;
+                const now = new Date();
+                this.activeBakes.forEach(bake => {
+                    const csi = this.getCurrentStepIndex(bake);
+                    const cs = bake.steps[csi];
+                    if (cs && !cs.completed && cs.started && !cs.noTimer) {
+                        const nsi = csi + 1;
+                        let endTime;
+                        if (nsi < bake.steps.length) {
+                            endTime = bake.steps[nsi].time.getTime();
+                        } else {
+                            endTime = cs.time.getTime() + cs.duration * (cs.unit === 'hours' ? 3600000 : 60000);
+                        }
+                        const tr = endTime - now.getTime();
+                        if (tr > 0 && tr < shortest) {
+                            shortest = tr; urgentBake = bake; urgentStep = cs; urgentIdx = csi;
+                        }
+                    }
+                });
+                if (!urgentBake || shortest <= 0) return;
+                // Only update every 15 seconds to avoid excessive notifications
+                if (!this._lastLiveNotif || now.getTime() - this._lastLiveNotif > 15000) {
+                    this._lastLiveNotif = now.getTime();
+                    try {
+                        new Notification(`${urgentBake.recipeName} — ${urgentStep.name}`, {
+                            body: `${this.fmtTR(shortest)} remaining`,
+                            tag: 'rs-live-timer',
+                            silent: true,
+                            renotify: true
+                        });
+                    } catch (e) {}
+                }
             },
 
             checkForNotifications() {
                 const now = new Date();
                 this.activeBakes.forEach(bake => {
                     bake.steps.forEach((step, i) => {
-                        if (step.completed || step.notified || !step.started) return;
+                        if (step.completed || step.notified || !step.started || step.noNotification) return;
                         if (step.time - now <= 0) {
                             step.notified = true;
                             this.sendNotification(bake, step, i);
@@ -1720,10 +1920,204 @@
                 if (this.currentModal) { this.currentModal.remove(); this.currentModal = null; }
             },
 
+            renderBakeNotes(bake) {
+                const container = document.getElementById('bakeNotesSection');
+                if (!container) return;
+                if (!bake.notes) bake.notes = [];
+                let notesHtml = bake.notes.map((note, i) => `<div class="bake-note-entry">
+                    <div class="note-time">${this.fmtDT(new Date(note.time))}</div>
+                    ${note.text ? `<div class="note-text">${note.text}</div>` : ''}
+                    ${note.photo ? `<img class="note-photo" src="${note.photo}" alt="Bake photo">` : ''}
+                </div>`).join('');
+
+                container.innerHTML = `<h3>Notes</h3>
+                    ${notesHtml}
+                    <div class="note-input-row">
+                        <input type="text" id="noteInput_${bake.id}" placeholder="Add a note...">
+                        <button class="note-photo-btn" onclick="app.addBakePhoto('${bake.id}')">📷</button>
+                        <button class="note-add-btn" onclick="app.addBakeNote('${bake.id}')">+</button>
+                    </div>
+                    <input type="file" id="photoInput_${bake.id}" accept="image/*" style="display:none" onchange="app.handlePhotoSelected('${bake.id}')">`;
+            },
+
+            addBakeNote(bakeId) {
+                const bake = this.activeBakes.find(b => b.id === bakeId);
+                if (!bake) return;
+                const input = document.getElementById(`noteInput_${bakeId}`);
+                if (!input || !input.value.trim()) return;
+                if (!bake.notes) bake.notes = [];
+                bake.notes.push({ text: input.value.trim(), time: new Date().toISOString() });
+                this.saveActiveBakes();
+                this.renderBakeNotes(bake);
+            },
+
+            addBakePhoto(bakeId) {
+                const input = document.getElementById(`photoInput_${bakeId}`);
+                if (input) input.click();
+            },
+
+            handlePhotoSelected(bakeId) {
+                const bake = this.activeBakes.find(b => b.id === bakeId);
+                if (!bake) return;
+                const input = document.getElementById(`photoInput_${bakeId}`);
+                if (!input || !input.files[0]) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    if (!bake.notes) bake.notes = [];
+                    // Resize image to avoid localStorage bloat
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const maxW = 800;
+                        const scale = img.width > maxW ? maxW / img.width : 1;
+                        canvas.width = img.width * scale;
+                        canvas.height = img.height * scale;
+                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                        bake.notes.push({ photo: canvas.toDataURL('image/jpeg', 0.7), time: new Date().toISOString() });
+                        this.saveActiveBakes();
+                        this.renderBakeNotes(bake);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            },
+
+            recipeRefExpanded: {},
+
+            renderRecipeReference(bake) {
+                const container = document.getElementById('recipeRefSection');
+                if (!container) return;
+                const recipes = this.getRecipes();
+                const recipe = recipes[bake.recipeKey];
+                if (!recipe) { container.innerHTML = ''; return; }
+                const isOpen = this.recipeRefExpanded[bake.id] || false;
+
+                let bodyHtml = '<div class="recipe-ref-body' + (isOpen ? ' open' : '') + '" id="recipeRefBody_' + bake.id + '">';
+                bodyHtml += '<div style="padding-top:12px">';
+
+                // Ingredients
+                const m = bake.ingredientMultiplier || 1;
+                bodyHtml += '<h4 style="color:#fff;font-size:15px;font-weight:600;margin-bottom:8px">Ingredients</h4><ul style="color:#EBEBF5;font-size:15px;margin-left:18px;line-height:1.6">';
+                recipe.ingredients.forEach(ing => {
+                    bodyHtml += `<li>${m > 1 ? this.scaleIng(ing, m) : ing}</li>`;
+                });
+                bodyHtml += '</ul>';
+
+                // Steps
+                const branchLabels = { 'today': 'Bake Day', 'cold': 'Cold Proof Option', 'refrigerate': 'Refrigerate Option', 'freeze': 'Freeze Option' };
+                let lastBranch = null;
+                bodyHtml += '<h4 style="color:#fff;font-size:15px;font-weight:600;margin:16px 0 8px">Steps</h4>';
+                recipe.steps.forEach((step) => {
+                    if (step.branch && step.branch !== lastBranch) {
+                        bodyHtml += `<div style="color:#0A84FF;font-size:13px;font-weight:600;margin:12px 0 6px;text-transform:uppercase">${branchLabels[step.branch] || step.branch}</div>`;
+                        lastBranch = step.branch;
+                    }
+                    const dur = typeof step.duration === 'object' ? `${step.duration.min}-${step.duration.max} ${step.duration.unit || 'min'}` : (step.duration ? `${step.duration} ${step.unit || 'min'}` : '');
+                    bodyHtml += `<div style="color:#EBEBF5;font-size:14px;padding:4px 0"><strong>${step.name}</strong>${dur ? ` — ${dur}` : ''}</div>`;
+                    if (step.guidance && step.guidance.visual) {
+                        bodyHtml += '<ul style="color:#8E8E93;font-size:13px;margin-left:18px;line-height:1.5">';
+                        step.guidance.visual.forEach(v => { bodyHtml += `<li>${m > 1 ? this.scaleIng(v, m) : v}</li>`; });
+                        bodyHtml += '</ul>';
+                    }
+                });
+                bodyHtml += '</div></div>';
+
+                container.innerHTML = `<div class="recipe-ref-header" onclick="app.toggleRecipeRef('${bake.id}')">
+                    <h3>Full Recipe</h3>
+                    <span class="ref-chevron ${isOpen ? 'open' : ''}">›</span>
+                </div>${bodyHtml}`;
+            },
+
+            toggleRecipeRef(bakeId) {
+                this.recipeRefExpanded[bakeId] = !this.recipeRefExpanded[bakeId];
+                const body = document.getElementById(`recipeRefBody_${bakeId}`);
+                if (body) body.classList.toggle('open');
+                const chevron = document.querySelector(`#recipeRefSection .ref-chevron`);
+                if (chevron) chevron.classList.toggle('open');
+            },
+
+            renderHistory() {
+                const container = document.getElementById('historyCard');
+                if (!container) return;
+                if (this.bakeHistory.length === 0) {
+                    container.classList.add('hidden');
+                    return;
+                }
+                container.classList.remove('hidden');
+                let html = '<h2>Bake History</h2>';
+                this.bakeHistory.slice().reverse().forEach((entry) => {
+                    const date = new Date(entry.finishedAt);
+                    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    const noteCount = (entry.notes || []).length;
+                    const noteLabel = noteCount > 0 ? ` · ${noteCount} note${noteCount > 1 ? 's' : ''}` : '';
+                    html += `<div class="history-item" onclick="app.showHistoryDetail('${entry.id}')">
+                        <h4>${entry.recipeName}</h4>
+                        <p>${dateStr}${noteLabel}</p>
+                    </div>`;
+                });
+                container.innerHTML = html;
+            },
+
+            showHistoryDetail(historyId) {
+                const entry = this.bakeHistory.find(h => h.id === historyId);
+                if (!entry) return;
+
+                ['mainScreen', 'recipeSelection', 'timelineSetup', 'timelineView', 'recipeDetailView', 'historyDetailView', 'addRecipeScreen'].forEach(id => {
+                    document.getElementById(id).classList.add('hidden');
+                });
+                document.getElementById('historyDetailView').classList.remove('hidden');
+                document.getElementById('historyDetailName').textContent = entry.recipeName;
+                this.currentScreen = 'historyDetailView';
+
+                const date = new Date(entry.finishedAt);
+                const dateStr = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+                let html = `<div style="color:#8E8E93;font-size:13px;margin-bottom:16px">Finished ${dateStr}</div>`;
+
+                // Steps summary
+                html += '<div style="background:#1C1C1E;border-radius:16px;padding:16px;margin-bottom:16px">';
+                html += '<h3 style="color:#fff;font-size:17px;font-weight:600;margin-bottom:10px">Steps</h3>';
+                (entry.steps || []).forEach(step => {
+                    const dur = step.duration ? `${step.duration} ${step.unit || 'min'}` : '';
+                    html += `<div style="padding:6px 0;color:#EBEBF5;font-size:15px"><span style="color:#30D158;margin-right:6px">✓</span>${step.name}${dur ? ` — ${dur}` : ''}</div>`;
+                });
+                html += '</div>';
+
+                // Notes
+                const notes = entry.notes || [];
+                if (notes.length > 0) {
+                    html += '<div style="background:#1C1C1E;border-radius:16px;padding:16px;margin-bottom:16px">';
+                    html += '<h3 style="color:#fff;font-size:17px;font-weight:600;margin-bottom:10px">Notes</h3>';
+                    notes.forEach(note => {
+                        html += '<div class="bake-note-entry">';
+                        html += `<div class="note-time">${this.fmtDT(new Date(note.time))}</div>`;
+                        if (note.text) html += `<div class="note-text">${note.text}</div>`;
+                        if (note.photo) html += `<img class="note-photo" src="${note.photo}" alt="Bake photo">`;
+                        html += '</div>';
+                    });
+                    html += '</div>';
+                } else {
+                    html += '<div class="history-empty">No notes for this bake</div>';
+                }
+
+                document.getElementById('historyDetailContent').innerHTML = html;
+            },
+
             finishBake(bakeId) {
                 const id = bakeId || this.currentBakeId;
                 if (!id) return;
                 if (confirm('Finish this bake? This cannot be undone.')) {
+                    const bake = this.activeBakes.find(b => b.id === id);
+                    if (bake) {
+                        this.bakeHistory.push({
+                            id: bake.id,
+                            recipeKey: bake.recipeKey,
+                            recipeName: bake.recipeName,
+                            steps: bake.steps.map(s => ({ name: s.name, duration: s.duration, unit: s.unit, completed: s.completed })),
+                            notes: bake.notes || [],
+                            finishedAt: new Date().toISOString()
+                        });
+                        this.saveBakeHistory();
+                    }
                     this.activeBakes = this.activeBakes.filter(b => b.id !== id);
                     this.saveActiveBakes();
                     this.showMainScreen();
