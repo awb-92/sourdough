@@ -704,6 +704,127 @@
                         }
                     }
                 ]
+            },
+            chocoEspresso: {
+                name: "Chocolate Espresso Sourdough",
+                description: "Double chocolate espresso sourdough with cocoa, espresso & chocolate chunks — Dutch oven, cold start",
+                ingredients: [
+                    "50g espresso (1 double shot)",
+                    "50g active sourdough starter",
+                    "325g warm water",
+                    "55g brown sugar",
+                    "470g bread flour",
+                    "30g unsweetened cocoa powder",
+                    "2g ground cinnamon (optional)",
+                    "9g salt",
+                    "180g chocolate chunks (optional)"
+                ],
+                steps: [
+                    {
+                        name: "Pull espresso",
+                        duration: 2, unit: "minutes",
+                        noTimer: true, noNotification: true, autoStartNext: true,
+                        guidance: {
+                            visual: ["Pull a double shot of espresso (~50g)", "Set aside to cool slightly"],
+                            tips: ["Let it cool enough so it won't kill your starter", "Strong brewed coffee works as a substitute"]
+                        }
+                    },
+                    {
+                        name: "Mix dough",
+                        duration: 10, unit: "minutes",
+                        noTimer: true, noNotification: true, autoStartNext: true,
+                        guidance: {
+                            visual: ["Combine 50g starter + 325g warm water + espresso shot + 55g brown sugar", "Mix until milky liquid", "Sift together 470g flour + 30g cocoa + 2g cinnamon + 9g salt", "Add dry to wet, mix until no dry flour remains"],
+                            tips: ["Use a straight-edge bowl to track rise", "Sift cocoa powder — it clumps easily", "Dough will look very dark and chocolate-y"]
+                        }
+                    },
+                    {
+                        name: "Autolyse",
+                        duration: 30, unit: "minutes",
+                        guidance: {
+                            visual: ["Cover bowl with damp towel or shower cap", "Let dough rest undisturbed"],
+                            tips: ["Dough will hydrate and become easier to work with"]
+                        }
+                    },
+                    {
+                        name: "Stretch & fold",
+                        duration: 30, unit: "minutes",
+                        expandable: true, foldInterval: 30,
+                        options: [
+                            { name: "4 sets (recommended)", sets: 4 },
+                            { name: "3 sets", sets: 3 },
+                            { name: "5 sets", sets: 5 }
+                        ],
+                        guidance: {
+                            visual: ["Wet fingers, scrape dough from bowl", "Stretch a section up and fold over itself", "Rotate bowl 90° and repeat until full circle"],
+                            tips: ["Add 180g chocolate chunks before the 2nd set", "Chunks may break through — that's fine, they'll incorporate", "Dough will be stiffer than plain sourdough due to cocoa"]
+                        }
+                    },
+                    {
+                        name: "Bulk fermentation",
+                        duration: 8, unit: "hours",
+                        guidance: {
+                            visual: ["Dough increased ~50-75% in size", "Looks light and jiggles when shaken", "Pulls away easily from the bowl", "Visible bubbles in the dough"],
+                            tips: ["6-9 hours typical at 68-70°F", "Warmer temps speed it up significantly", "Don't rely on time alone — use visual cues", "Windowpane test: dough shouldn't tear when stretched thin"]
+                        }
+                    },
+                    {
+                        name: "Pre-shape + bench rest",
+                        duration: 30, unit: "minutes",
+                        guidance: {
+                            visual: ["Gently release dough from bowl with wet fingers", "Tilt bowl and let gravity move dough onto counter", "Do a round of stretch and folds", "Flip seam-side down, rest 30 minutes"],
+                            tips: ["Light touch — don't pop all the bubbles"]
+                        }
+                    },
+                    {
+                        name: "Final shape",
+                        duration: 10, unit: "minutes",
+                        guidance: {
+                            visual: ["Flip dough, pull bottom toward you and fold to center", "Repeat from sides and top to form a tight package", "Gently roll to create tension on the surface", "Place seam-side up in floured banneton"],
+                            tips: ["Dust banneton with rice or AP flour to prevent sticking", "Tighter shaping = better oven spring"]
+                        }
+                    },
+                    {
+                        name: "Cold proof",
+                        duration: 12, unit: "hours",
+                        guidance: {
+                            visual: ["Cover and place in fridge 8-72 hours"],
+                            tips: ["Deepens flavor and makes scoring easier", "Don't wait too long — over-fermented dough won't rise", "You have flexibility on when to bake"]
+                        }
+                    },
+                    {
+                        name: "Score", branch: "today",
+                        duration: 10, unit: "minutes",
+                        guidance: {
+                            visual: ["Optional: freeze dough 30 min before scoring", "Flip banneton onto parchment paper", "Dust surface with flour", "Score with lame/razor — crescent moon or your own design"],
+                            tips: ["Freezer tip makes scoring much easier", "Flour helps the score design pop", "Place scored dough into Dutch oven on parchment"]
+                        }
+                    },
+                    {
+                        name: "Bake (lid on)",
+                        duration: 50, unit: "minutes", branch: "today",
+                        guidance: {
+                            visual: ["Place Dutch oven + lid on a baking sheet (prevents burning bottom)", "Put in COLD oven, set to 450°F", "Bake 50 minutes total including preheat"],
+                            tips: ["Cold start method — no preheating needed", "Baking sheet underneath is important for this chocolate dough"]
+                        }
+                    },
+                    {
+                        name: "Bake (lid off)",
+                        duration: 8, unit: "minutes", branch: "today",
+                        guidance: {
+                            visual: ["Remove lid", "Bake 5-10 more minutes until crust is crispy"],
+                            tips: ["Watch carefully — dark dough makes it harder to judge browning"]
+                        }
+                    },
+                    {
+                        name: "Cool",
+                        duration: 60, unit: "minutes", branch: "today",
+                        guidance: {
+                            visual: ["Remove from Dutch oven immediately using parchment edges", "Cool on wire rack for 1 hour minimum"],
+                            tips: ["Interior is still cooking — cutting too soon makes it gummy", "Listen for the crackle — your loaf is 'singing'!"]
+                        }
+                    }
+                ]
             }
         };
 
