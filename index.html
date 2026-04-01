@@ -826,6 +826,161 @@
                     }
                 ]
             }
+            pretzelBread: {
+                name: "Cheesy Sourdough Pretzel Bread",
+                description: "Boiled & baked pretzel loaf with cheddar cheese, Dutch oven",
+                ingredients: [
+                    "150g active sourdough starter (levain)",
+                    "330g water",
+                    "30g brown sugar",
+                    "10g salt",
+                    "500g bread flour",
+                    "100g cheddar cheese, shredded",
+                    "1680g water (for boiling, ~7 cups)",
+                    "75g baking soda (for boiling)",
+                    "Pretzel salt",
+                    "14g butter (for brushing)"
+                ],
+                note: "Build a levain 4 hours before: 50g starter + 50g flour + 50g water at 77-80°F until doubled.",
+                steps: [
+                    {
+                        name: "Build levain",
+                        duration: 4, unit: "hours",
+                        guidance: {
+                            visual: ["Mix 50g starter + 50g flour + 50g water", "Cover and rest at 77-80°F until bubbly and doubled"],
+                            tips: ["Skip if your starter is already active and ready", "Night-before option: 15g starter + 70g flour + 70g water, ~10 hours at 72°F"]
+                        }
+                    },
+                    {
+                        name: "Prep cheese",
+                        duration: 2, unit: "minutes",
+                        noTimer: true, noNotification: true, autoStartNext: true,
+                        guidance: {
+                            visual: ["Shred 100g cheddar cheese", "Set aside at room temperature"],
+                            tips: ["Room temp cheese prevents cooling the dough and slowing fermentation"]
+                        }
+                    },
+                    {
+                        name: "Mix dough",
+                        duration: 5, unit: "minutes",
+                        noTimer: true, noNotification: true, autoStartNext: true,
+                        guidance: {
+                            visual: ["Combine 330g water + 150g levain + 30g brown sugar in a bowl", "Add 500g bread flour + 10g salt", "Mix until no dry flour remains"],
+                            tips: ["Dough will be shaggy — that's fine", "Don't add cheese yet"]
+                        }
+                    },
+                    {
+                        name: "Autolyse",
+                        duration: 30, unit: "minutes",
+                        guidance: {
+                            visual: ["Cover and let dough rest"],
+                            tips: ["Dough will hydrate and become smoother"]
+                        }
+                    },
+                    {
+                        name: "Stretch & fold",
+                        duration: 30, unit: "minutes",
+                        expandable: true, foldInterval: 30,
+                        options: [
+                            { name: "3 sets (recommended)", sets: 3 },
+                            { name: "4 sets", sets: 4 }
+                        ],
+                        guidance: {
+                            visual: ["Grab one side with a damp hand, shimmy up and fold over", "Rotate 90° and repeat 3 more times", "Cover between sets"],
+                            tips: ["Add cheese during the 2nd set", "Keep dough warm between sets"]
+                        }
+                    },
+                    {
+                        name: "Bulk fermentation",
+                        duration: 4, unit: "hours",
+                        guidance: {
+                            visual: ["Dough is jiggly and domed on top", "Bubbly on the sides", "Risen ~50%"],
+                            tips: ["~4 hours at 75°F dough temp after mixing", "Don't rely on time — watch for visual cues", "If not showing signs, keep going"]
+                        }
+                    },
+                    {
+                        name: "Shape",
+                        duration: 10, unit: "minutes",
+                        guidance: {
+                            visual: ["Turn dough onto unfloured surface", "Stretch into thick rectangle", "Fold top down, corners in, roll into a ball", "Cup hands and rotate to build surface tension"],
+                            tips: ["Work on an unfloured surface for better grip"]
+                        },
+                        postProofChoice: true
+                    },
+                    {
+                        name: "Final proof (room temp)",
+                        duration: 90, unit: "minutes", branch: "today",
+                        guidance: {
+                            visual: ["Place seam-side up in floured banneton", "Rest at 75°F for 1-2 hours"],
+                            tips: ["Poke test: press with floured finger — should slowly spring back", "If it springs back quickly, it needs more time"]
+                        }
+                    },
+                    {
+                        name: "Cold proof (fridge)",
+                        duration: 720, unit: "minutes", branch: "cold",
+                        guidance: {
+                            visual: ["Place seam-side up in floured banneton", "Cover and refrigerate 8-16 hours"],
+                            tips: ["Better flavor development", "Can bake straight from fridge next day"]
+                        }
+                    },
+                    {
+                        name: "Preheat oven + Dutch oven",
+                        duration: 30, unit: "minutes", branch: "today",
+                        guidance: {
+                            visual: ["Place Dutch oven inside oven", "Preheat to 450°F"],
+                            tips: ["Place a pizza stone on rack below to prevent bottom burning"]
+                        }
+                    },
+                    {
+                        name: "Boil water + baking soda",
+                        duration: 10, unit: "minutes", branch: "today",
+                        guidance: {
+                            visual: ["Add 7 cups water + 75g baking soda to a large pot", "Bring to a boil"],
+                            tips: ["Use a 3-4 quart saucier or wide pot"]
+                        }
+                    },
+                    {
+                        name: "Boil bread",
+                        duration: 2, unit: "minutes", branch: "today",
+                        guidance: {
+                            visual: ["Flip dough onto silicone sling or large parchment", "Lower into boiling water", "Ladle boiling water over the top for 1-2 minutes"],
+                            tips: ["Keep sling/parchment edges out of the water", "This step gives the pretzel crust its signature color and chew"]
+                        }
+                    },
+                    {
+                        name: "Score + salt",
+                        duration: 3, unit: "minutes", branch: "today",
+                        guidance: {
+                            visual: ["Lift dough out of water with sling/parchment", "If using parchment, transfer to a new dry piece", "Score the top with a lame or sharp knife", "Sprinkle with pretzel salt"],
+                            tips: ["Score while dough is still wet for clean cuts"]
+                        }
+                    },
+                    {
+                        name: "Bake (lid on)",
+                        duration: 25, unit: "minutes", branch: "today",
+                        guidance: {
+                            visual: ["Transfer dough to hot Dutch oven", "Bake covered at 450°F for 25 minutes"],
+                            tips: ["Be careful — Dutch oven is extremely hot"]
+                        }
+                    },
+                    {
+                        name: "Bake (lid off)",
+                        duration: 14, unit: "minutes", branch: "today",
+                        guidance: {
+                            visual: ["Remove lid", "Bake 12-15 more minutes until deep brown"],
+                            tips: ["Done when internal temp reaches 205°F"]
+                        }
+                    },
+                    {
+                        name: "Cool",
+                        duration: 30, unit: "minutes", branch: "today",
+                        guidance: {
+                            visual: ["Remove from Dutch oven", "Cool on wire rack before slicing", "Brush crust with melted butter + more pretzel salt if serving now"],
+                            tips: ["Skip the butter/salt if not serving the whole loaf — it won't store well"]
+                        }
+                    }
+                ]
+            }
         };
 
         const app = {
