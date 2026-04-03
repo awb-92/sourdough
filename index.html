@@ -981,8 +981,9 @@
                         ],
                         guidance: {
                             visual: ["Grab one side with a damp hand, shimmy up and fold over", "Rotate 90° and repeat 3 more times", "Cover between sets"],
-                            tips: ["Add cheese during the 2nd set", "Keep dough warm between sets"]
-                        }
+                            tips: ["⚠️ Add cheese during the 2nd set!", "Keep dough warm between sets"]
+                        },
+                        alert: "Add 100g shredded cheddar before set 2"
                     },
                     {
                         name: "Bulk fermentation",
@@ -2130,8 +2131,10 @@
                 const timeStr = this.fmtDT(step.time);
                 const isNoTimer = step.noTimer;
                 const durStr = isNoTimer ? 'No timer' : (step.duration > 0 ? `${step.duration} ${step.unit}` : 'Ready');
-                const needsChoice = step.postProofChoice && isActive && !step.postProofDecision;
-                const needsBulkChoice = step.bulkFermentChoice && isActive && !step.bulkFermentDecision;
+                const hasPostProofChoice = step.postProofChoice || (recipeStep && recipeStep.postProofChoice);
+                const needsChoice = hasPostProofChoice && isActive && !step.postProofDecision;
+                const hasBulkFermentChoice = step.bulkFermentChoice || (recipeStep && recipeStep.bulkFermentChoice);
+                const needsBulkChoice = hasBulkFermentChoice && isActive && !step.bulkFermentDecision;
                 const needsFrozen = step.waitingForFrozenInput && isActive;
 
                 let bulkChoiceHtml = '';
@@ -2191,6 +2194,7 @@
                         </div>
                     </div>
                     <div class="step-duration">${durStr}</div>
+                    ${hasPostProofChoice && !isActive && !isCompleted ? `<div style="color:#8E8E93;font-size:13px;margin-top:4px">↳ Choose bake today or cold proof after this step</div>` : ''}
                     ${step.alert && !isCompleted ? `<div style="background:rgba(255,214,10,0.15);border:1px solid rgba(255,214,10,0.3);border-radius:8px;padding:8px 12px;margin-top:8px;font-size:14px;color:#FFD60A;font-weight:500">⚠ ${step.alert}</div>` : ''}
                     ${step.guidance ? (() => {
                         const m = bake.ingredientMultiplier || 1;
@@ -2623,8 +2627,21 @@
                 t.className = 'notification-toast';
                 t.innerHTML = `<div class="notification-toast-title">${title}</div><div class="notification-toast-body">Time for: ${stepName}</div>`;
                 document.body.appendChild(t);
-                setTimeout(() => { t.style.animation = 'slideDown 0.3s reverse forwards'; setTimeout(() => t.remove(), 300); }, 5000);
-                t.onclick = () => t.remove();
+                const dismiss = () => { t.style.animation = 'slideDown 0.3s reverse forwards'; setTimeout(() => t.remove(), 300); };
+                const autoTimer = setTimeout(dismiss, 3000);
+                t.onclick = () => { clearTimeout(autoTimer); dismiss(); };
+                // Swipe up to dismiss
+                let startY = 0;
+                t.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, { passive: true });
+                t.addEventListener('touchmove', e => {
+                    const dy = e.touches[0].clientY - startY;
+                    if (dy < 0) t.style.transform = `translateY(${dy}px)`;
+                }, { passive: true });
+                t.addEventListener('touchend', e => {
+                    const dy = e.changedTouches[0].clientY - startY;
+                    if (dy < -30) { clearTimeout(autoTimer); dismiss(); }
+                    else t.style.transform = '';
+                });
             },
 
             playAlert() {
