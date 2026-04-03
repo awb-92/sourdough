@@ -59,8 +59,8 @@
         .active-bakes h2, #timelineSteps h3 { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 12px; letter-spacing: -0.26px; }
         .bake-card { background: #1C1C1E; padding: 16px; border-radius: 16px; margin-bottom: 10px; cursor: pointer; transition: transform 0.15s; }
         .bake-card:active { transform: scale(0.98); }
-        .bake-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .bake-card-header h3 { color: #fff; font-size: 17px; font-weight: 600; }
+        .bake-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; }
+        .bake-card-header h3 { color: #fff; font-size: 17px; font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .bake-card-header .bake-card-actions { display: flex; gap: 8px; }
         .bake-card-steps { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
         .bake-card-step { display: flex; justify-content: space-between; font-size: 14px; }
@@ -84,6 +84,11 @@
         .menu-item:last-child { border-bottom: none; }
         .menu-item-icon { width: 28px; text-align: center; display: inline-flex; align-items: center; justify-content: center; }
         .menu-item-icon svg { width: 20px; height: 20px; stroke: #0A84FF; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+        .menu-section-label { font-size: 11px; font-weight: 600; color: #8E8E93; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 20px; margin-bottom: 4px; }
+        .menu-bake-item { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 0.5px solid rgba(60,60,67,0.36); color: #fff; font-size: 15px; cursor: pointer; transition: opacity 0.15s; }
+        .menu-bake-item:active { opacity: 0.6; }
+        .menu-bake-item:last-child { border-bottom: none; }
+        .menu-bake-step { font-size: 12px; color: #8E8E93; margin-top: 2px; }
 
         /* Timeline Preview */
         .timeline-preview { margin-top: 20px; }
@@ -204,6 +209,22 @@
         .guidance-content ul { margin-left: 18px; margin-top: 6px; }
         .guidance-content li { margin: 4px 0; }
 
+        /* ─── Step Notes ─── */
+        .step-note-input { width: 100%; margin-top: 10px; padding: 10px 14px; background: #2C2C2E; border: none; border-radius: 10px; color: #fff; font-size: 14px; font-family: inherit; min-height: 36px; resize: none; line-height: 1.4; }
+        .step-note-input::placeholder { color: #636366; }
+        .step-note-input:focus { outline: 2px solid #0A84FF; outline-offset: -2px; }
+        .step-note-display { margin-top: 8px; padding: 8px 12px; background: #2C2C2E; border-radius: 10px; font-size: 13px; color: #EBEBF5; line-height: 1.4; font-style: italic; }
+
+        /* ─── Starter Reminder ─── */
+        .starter-reminder { background: #2C2C2E; border-radius: 12px; padding: 16px; margin: 16px 0; }
+        .starter-reminder h4 { color: #FFFFFF; font-size: 15px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .starter-reminder .reminder-time { color: #FFD60A; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
+        .starter-reminder .reminder-note { color: #8E8E93; font-size: 13px; margin-top: 6px; }
+        .starter-reminder .reminder-set { color: #30D158; font-size: 13px; font-weight: 500; margin-top: 8px; }
+        .starter-lead-pills { display: flex; gap: 6px; margin: 10px 0; }
+        .starter-lead-pill { padding: 6px 12px; background: #3A3A3C; border: none; border-radius: 16px; color: #fff; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .starter-lead-pill.active { background: #0A84FF; }
+
         /* ─── iOS Toggle Slider ─── */
         .step-toggle-row { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; }
         .step-toggle-label { font-size: 15px; color: #8E8E93; font-weight: 500; }
@@ -219,9 +240,8 @@
         .step-actions { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
         .step-actions .btn { flex: 1; min-width: 130px; }
         .hidden { display: none; }
-        .mt-20 { margin-top: 16px; }
-        .mb-20 { margin-bottom: 16px; }
-        .text-center { text-align: center; }
+        .mt-16 { margin-top: 16px; }
+        .mb-16 { margin-bottom: 16px; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 
         /* ─── Notification Status ─── */
@@ -336,6 +356,7 @@
         <div class="menu-item" onclick="app.closeMenu(); app.showHistoryScreen();">
             <span class="menu-item-icon"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span> History
         </div>
+        <div id="menuActiveBakes"></div>
     </div>
 
     <div class="container">
@@ -366,7 +387,7 @@
         <!-- Main Screen -->
         <div id="mainScreen">
             <div class="active-bakes">
-                <div class="flex-between mb-20">
+                <div class="flex-between mb-16">
                     <h2>Active Bakes</h2>
                     <button class="btn" onclick="app.showRecipeSelection()">+ Start New Bake</button>
                 </div>
@@ -416,7 +437,8 @@
                 </div>
                 <div id="recipeOptions" class="options-section"></div>
                 <div id="timelinePreview"></div>
-                <button class="btn btn-success mt-20" style="width:100%" onclick="app.calculateTimeline()">Start Bake</button>
+                <div id="starterReminderSection"></div>
+                <button class="btn btn-success mt-16" style="width:100%" onclick="app.calculateTimeline()">Start Bake</button>
             </div>
         </div>
 
@@ -485,8 +507,8 @@
             </div>
             <h3 style="font-size:17px;font-weight:600;margin:16px 0 10px;">Steps</h3>
             <div id="newRecipeSteps"></div>
-            <button class="btn btn-secondary mt-20" style="width:100%" onclick="app.addNewStepField()">+ Add Step</button>
-            <button class="btn btn-success mt-20" style="width:100%" onclick="app.saveCustomRecipe()">Save Recipe</button>
+            <button class="btn btn-secondary mt-16" style="width:100%" onclick="app.addNewStepField()">+ Add Step</button>
+            <button class="btn btn-success mt-16" style="width:100%" onclick="app.saveCustomRecipe()">Save Recipe</button>
         </div>
     </div>
 
@@ -825,8 +847,9 @@
                         ],
                         guidance: {
                             visual: ["Wet fingers, scrape dough from bowl", "Stretch a section up and fold over itself", "Rotate bowl 90° and repeat until full circle"],
-                            tips: ["Add 180g chocolate chunks before the 2nd set", "Chunks may break through — that's fine, they'll incorporate", "Dough will be stiffer than plain sourdough due to cocoa"]
-                        }
+                            tips: ["⚠️ Add 180g chocolate chunks before the 2nd set!", "Chunks may break through — that's fine, they'll incorporate", "Dough will be stiffer than plain sourdough due to cocoa"]
+                        },
+                        alert: "Add 180g chocolate chunks before set 2"
                     },
                     {
                         name: "Bulk fermentation",
@@ -1064,6 +1087,11 @@
             bakeHistory: [],
             ingredientsCollapsed: {},
             completedStepsExpanded: {},
+            wakeLock: null,
+            audioCtx: null,
+            starterLeadHours: 6,
+            starterReminderTime: null,
+            starterReminderFired: false,
 
             init() {
                 this.loadActiveBakes();
@@ -1075,6 +1103,12 @@
                 this.setDefaultStartTime();
                 this.startTimerUpdates();
                 this.checkNotificationPermission();
+                // Re-acquire wake lock when returning to tab (browsers release on visibility change)
+                document.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'visible' && this.currentScreen === 'timelineView') {
+                        this.acquireWakeLock();
+                    }
+                });
             },
 
             getRecipes() {
@@ -1168,11 +1202,44 @@
                     const el = document.getElementById(id);
                     if (el) { el.classList.add('hidden'); el.classList.remove('screen-enter'); }
                 });
+                this.releaseWakeLock();
+            },
+
+            async acquireWakeLock() {
+                if (!('wakeLock' in navigator)) return;
+                try {
+                    this.wakeLock = await navigator.wakeLock.request('screen');
+                    this.wakeLock.addEventListener('release', () => { this.wakeLock = null; });
+                } catch (e) { /* browser denied wake lock */ }
+            },
+
+            async releaseWakeLock() {
+                if (this.wakeLock) { try { await this.wakeLock.release(); } catch(e) {} this.wakeLock = null; }
             },
 
             toggleMenu() {
                 document.getElementById('menuOverlay').classList.toggle('open');
                 document.getElementById('menuDrawer').classList.toggle('open');
+                this.renderMenuActiveBakes();
+            },
+
+            renderMenuActiveBakes() {
+                const container = document.getElementById('menuActiveBakes');
+                if (!container) return;
+                try {
+                    if (this.activeBakes.length === 0) { container.innerHTML = ''; return; }
+                    let html = '<div class="menu-section-label">Active Bakes</div>';
+                    this.activeBakes.forEach(bake => {
+                        const csi = this.getCurrentStepIndex(bake);
+                        const cs = bake.steps && bake.steps[csi];
+                        const stepName = cs ? cs.name : '';
+                        html += `<div class="menu-bake-item" onclick="app.closeMenu(); app.showTimelineView('${bake.id}');">
+                            <span class="menu-item-icon"><svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h4m2-2v4m-4 4h8m-8 4h6"/></svg></span>
+                            <div><div>${bake.recipeName}</div><div class="menu-bake-step">${stepName}</div></div>
+                        </div>`;
+                    });
+                    container.innerHTML = html;
+                } catch(e) { console.error('Menu bakes error:', e); }
             },
 
             closeMenu() {
@@ -1254,11 +1321,16 @@
                 this.setDefaultStartTime();
                 this.updateGlobalTimerBanner();
                 this.currentScreen = 'timelineSetup';
-                // Hook inputs to update preview
-                const updatePreview = () => this.renderTimelinePreview();
-                document.getElementById('startTime').addEventListener('change', updatePreview);
-                document.getElementById('endTime').addEventListener('change', updatePreview);
-                document.getElementById('startingStep').addEventListener('change', updatePreview);
+                // Hook inputs to update preview (use bound ref to avoid accumulating listeners)
+                if (this._previewHandler) {
+                    document.getElementById('startTime').removeEventListener('change', this._previewHandler);
+                    document.getElementById('endTime').removeEventListener('change', this._previewHandler);
+                    document.getElementById('startingStep').removeEventListener('change', this._previewHandler);
+                }
+                this._previewHandler = () => this.renderTimelinePreview();
+                document.getElementById('startTime').addEventListener('change', this._previewHandler);
+                document.getElementById('endTime').addEventListener('change', this._previewHandler);
+                document.getElementById('startingStep').addEventListener('change', this._previewHandler);
                 this.renderTimelinePreview();
             },
 
@@ -1277,6 +1349,7 @@
                 this.renderIngredients(bake);
                 this.renderTimelineSteps(bake);
                 this.updateGlobalTimerBanner();
+                this.acquireWakeLock();
                 this.currentScreen = 'timelineView';
             },
 
@@ -1344,7 +1417,7 @@
                     html += `</div>`;
                 });
                 html += `</div>`;
-                html += `<button class="btn btn-success mt-20" style="width:100%" onclick="app.showTimelineSetup('${recipeKey}')">Start This Recipe</button>`;
+                html += `<button class="btn btn-success mt-16" style="width:100%" onclick="app.showTimelineSetup('${recipeKey}')">Start This Recipe</button>`;
                 document.getElementById('recipeDetailContent').innerHTML = html;
                 this.currentScreen = 'recipeDetail';
             },
@@ -1425,7 +1498,7 @@
                         <span class="chevron">›</span>
                     </div>`;
                 });
-                html += `<button class="btn btn-secondary mt-20" style="width:100%" onclick="app.showAddRecipe()">+ Add Recipe</button>`;
+                html += `<button class="btn btn-secondary mt-16" style="width:100%" onclick="app.showAddRecipe()">+ Add Recipe</button>`;
                 container.innerHTML = html;
             },
 
@@ -1483,7 +1556,7 @@
                         <div class="bake-card-header">
                             <h3>${bake.recipeName}</h3>
                             <div class="bake-card-actions">
-                                <button class="btn btn-danger" onclick="event.stopPropagation(); app.finishBake('${bake.id}')">Finish</button>
+                                <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); app.finishBake('${bake.id}')">Finish</button>
                             </div>
                         </div>
                         <div class="bake-card-steps">
@@ -1576,7 +1649,7 @@
                         } else {
                             d = step.duration || 0;
                         }
-                        const u = step.unit || 'minutes';
+                        const u = (typeof step.duration === 'object' ? step.duration.unit : step.unit) || 'minutes';
                         steps.push({ name: step.name, time: new Date(ct), duration: d, unit: u, branch: step.branch || null });
                         ct = new Date(ct.getTime() + d * (u === 'hours' ? 3600000 : 60000));
                     });
@@ -1657,6 +1730,102 @@
                 }
                 html += '</div>';
                 container.innerHTML = html;
+                this.renderStarterReminder();
+            },
+
+            renderStarterReminder() {
+                const container = document.getElementById('starterReminderSection');
+                if (!container) return;
+                // Only show for recipes that use starter (check ingredients)
+                const recipes = this.getRecipes();
+                const recipe = recipes[this.selectedRecipe];
+                if (!recipe) { container.innerHTML = ''; return; }
+                const hasStarter = recipe.ingredients && recipe.ingredients.some(ig => /starter|levain/i.test(ig));
+                if (!hasStarter) { container.innerHTML = ''; return; }
+
+                let startTime;
+                if (this.mode === 'forward') {
+                    const v = document.getElementById('startTime').value;
+                    startTime = v ? new Date(v) : new Date();
+                } else {
+                    const v = document.getElementById('endTime').value;
+                    const endTime = v ? new Date(v) : new Date();
+                    const totalDuration = this.calcTotalDur(recipe, 0);
+                    startTime = new Date(endTime - totalDuration);
+                }
+
+                const feedTime = new Date(startTime.getTime() - this.starterLeadHours * 3600000);
+                const now = new Date();
+                const isPast = feedTime < now;
+                const fmtT = (d) => d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                const fmtD = (d) => {
+                    const today = new Date();
+                    if (d.toDateString() === today.toDateString()) return 'Today';
+                    const tmrw = new Date(today); tmrw.setDate(tmrw.getDate() + 1);
+                    if (d.toDateString() === tmrw.toDateString()) return 'Tomorrow';
+                    return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                };
+
+                const leadOptions = [4, 6, 8, 12];
+                const pillsHtml = leadOptions.map(h =>
+                    `<button class="starter-lead-pill${h === this.starterLeadHours ? ' active' : ''}" onclick="app.setStarterLeadHours(${h})">${h}h</button>`
+                ).join('');
+
+                const reminderActive = this.starterReminderTime && !this.starterReminderFired;
+
+                let html = `<div class="starter-reminder">
+                    <h4><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#FFD60A;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Feed Your Starter</h4>
+                    <div>Feed <span class="reminder-time">${this.starterLeadHours}h before</span> mixing</div>
+                    <div class="starter-lead-pills">${pillsHtml}</div>
+                    <div style="margin-top:8px">
+                        <span style="color:#EBEBF5;font-size:15px">${fmtD(feedTime)} at </span>
+                        <span class="reminder-time">${fmtT(feedTime)}</span>
+                    </div>`;
+
+                if (isPast) {
+                    const hoursAgo = Math.round((now - feedTime) / 3600000);
+                    html += `<div class="reminder-note" style="color:#FF453A">⚠ Feeding time was ${hoursAgo}h ago</div>`;
+                } else if (reminderActive) {
+                    html += `<div class="reminder-set">✓ Reminder set</div>`;
+                } else {
+                    html += `<button class="btn btn-sm" style="margin-top:10px" onclick="app.setStarterReminder()">Set Reminder</button>`;
+                }
+
+                html += '</div>';
+                container.innerHTML = html;
+            },
+
+            setStarterLeadHours(hours) {
+                this.starterLeadHours = hours;
+                this.starterReminderTime = null;
+                this.starterReminderFired = false;
+                this.renderStarterReminder();
+            },
+
+            setStarterReminder() {
+                let startTime;
+                if (this.mode === 'forward') {
+                    const v = document.getElementById('startTime').value;
+                    startTime = v ? new Date(v) : new Date();
+                } else {
+                    const v = document.getElementById('endTime').value;
+                    const recipes = this.getRecipes();
+                    const recipe = recipes[this.selectedRecipe];
+                    const endTime = v ? new Date(v) : new Date();
+                    startTime = new Date(endTime - this.calcTotalDur(recipe, 0));
+                }
+                this.starterReminderTime = new Date(startTime.getTime() - this.starterLeadHours * 3600000);
+                this.starterReminderFired = false;
+                this.renderStarterReminder();
+            },
+
+            sendStarterReminder() {
+                this.starterReminderFired = true;
+                this.playAlert();
+                const recipeName = this.selectedRecipe ? (this.getRecipes()[this.selectedRecipe]?.name || 'your bake') : 'your bake';
+                if (Notification.permission === 'granted') {
+                    new Notification('Feed Your Starter', { body: `Time to feed your starter for ${recipeName}!`, icon: '🍞' });
+                }
             },
 
             setDefaultStartTime() {
@@ -1731,19 +1900,20 @@
                     } else {
                         if (step.branch) return; // skip branch steps during initial timeline
                     }
-                    const isCompleted = index < startingStepIndex;
                     let duration;
 
                     if (step.expandable && step.options) {
                         const soi = selectedOptions[index] || 0;
                         const opt = step.options[soi];
                         for (let s = 1; s <= opt.sets; s++) {
-                            bake.steps.push({
+                            const stepData = {
                                 name: `${step.name} (${s}/${opt.sets})`,
                                 time: new Date(currentTime), duration: step.foldInterval, unit: 'minutes',
-                                guidance: step.guidance, completed: isCompleted,
+                                guidance: step.guidance, completed: false,
                                 selectedOption: opt.name, stepIndex: index
-                            });
+                            };
+                            if (s === 1 && step.alert) stepData.alert = step.alert;
+                            bake.steps.push(stepData);
                             currentTime = new Date(currentTime.getTime() + step.foldInterval * 60000);
                         }
                     } else if (step.options) {
@@ -1753,7 +1923,7 @@
                         const unit = opt.unit || step.unit;
                         bake.steps.push({
                             name: step.name, time: new Date(currentTime), duration, unit,
-                            guidance: step.guidance, completed: isCompleted,
+                            guidance: step.guidance, completed: false,
                             selectedOption: opt.name, stepIndex: index,
                             postProofChoice: step.postProofChoice || false
                         });
@@ -1765,15 +1935,15 @@
                             duration = step.duration || 0;
                         }
                         bake.steps.push({
-                            name: step.name, time: new Date(currentTime), duration, unit: step.unit || 'minutes',
-                            guidance: step.guidance, completed: isCompleted, stepIndex: index,
+                            name: step.name, time: new Date(currentTime), duration, unit: (typeof step.duration === 'object' ? step.duration.unit : step.unit) || 'minutes',
+                            guidance: step.guidance, completed: false, stepIndex: index,
                             postProofChoice: step.postProofChoice || false,
                             bulkFermentChoice: step.bulkFermentChoice || false,
                             noTimer: step.noTimer || false,
                             noNotification: step.noNotification || false,
                             autoStartNext: step.autoStartNext || false
                         });
-                        const u = step.unit || 'minutes';
+                        const u = (typeof step.duration === 'object' ? step.duration.unit : step.unit) || 'minutes';
                         currentTime = new Date(currentTime.getTime() + duration * (u === 'hours' ? 3600000 : 60000));
                     }
                 });
@@ -1809,7 +1979,7 @@
                     } else {
                         if (typeof step.duration === 'object' && step.duration.min) d = (step.duration.min + step.duration.max) / 2;
                         else d = step.duration || 0;
-                        const u = step.unit || 'minutes';
+                        const u = (typeof step.duration === 'object' ? step.duration.unit : step.unit) || 'minutes';
                         total += d * (u === 'hours' ? 3600000 : 60000);
                     }
                 });
@@ -1926,6 +2096,10 @@
                         completedSteps.forEach(({ step, index }) => {
                             html += this.renderStepCard(bake, step, index, csi, recipe);
                         });
+                    } else {
+                        // Always show the last completed step with undo button
+                        const last = completedSteps[completedSteps.length - 1];
+                        html += this.renderStepCard(bake, last.step, last.index, csi, recipe);
                     }
                 }
 
@@ -2015,6 +2189,7 @@
                         </div>
                     </div>
                     <div class="step-duration">${durStr}</div>
+                    ${step.alert && !isCompleted ? `<div style="background:rgba(255,214,10,0.15);border:1px solid rgba(255,214,10,0.3);border-radius:8px;padding:8px 12px;margin-top:8px;font-size:14px;color:#FFD60A;font-weight:500">⚠ ${step.alert}</div>` : ''}
                     ${step.guidance ? (() => {
                         const m = bake.ingredientMultiplier || 1;
                         const sc = (t) => m > 1 ? this.scaleIng(t, m) : t;
@@ -2031,6 +2206,9 @@
                         <button class="btn btn-success" onclick="app.setFrozenPullTime('${bake.id}',${index})">Set Time & Continue</button>
                     </div>` : ''}
                     ${actionHtml}
+                    ${isActive ? `<textarea class="step-note-input" placeholder="Add a note..." rows="1" onblur="app.saveStepNote('${bake.id}',${index},this.value)" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'">${step.stepNote || ''}</textarea>` : ''}
+                    ${isCompleted && step.stepNote ? `<div class="step-note-display">${step.stepNote}</div>` : ''}
+                    ${isCompleted && index === csi - 1 ? `<button class="btn btn-secondary btn-sm" style="margin-top:8px;width:100%" onclick="app.uncompleteStep('${bake.id}',${index})">↩ Undo Complete</button>` : ''}
                 </div>`;
             },
 
@@ -2182,6 +2360,13 @@
                 this.updateGlobalTimerBanner();
             },
 
+            saveStepNote(bakeId, stepIndex, text) {
+                const bake = this.activeBakes.find(b => b.id === bakeId);
+                if (!bake) return;
+                bake.steps[stepIndex].stepNote = text.trim();
+                this.saveActiveBakes();
+            },
+
             completeStep(bakeId, stepIndex) {
                 const bake = this.activeBakes.find(b => b.id === bakeId);
                 if (!bake) return;
@@ -2206,9 +2391,27 @@
                 this.updateGlobalTimerBanner();
             },
 
-            getCurrentStep(bake) {
-                for (let i = 0; i < bake.steps.length; i++) { if (!bake.steps[i].completed) return bake.steps[i]; }
-                return bake.steps[bake.steps.length - 1];
+            uncompleteStep(bakeId, stepIndex) {
+                const bake = this.activeBakes.find(b => b.id === bakeId);
+                if (!bake) return;
+                bake.steps[stepIndex].completed = false;
+                bake.steps[stepIndex].completedAt = null;
+                bake.steps[stepIndex].started = true;
+                // Reset currentStepIndex to this step
+                bake.currentStepIndex = stepIndex;
+                // Recalculate future step times from this step
+                const now = new Date();
+                const d = bake.steps[stepIndex].duration || 0;
+                let ct = new Date(now.getTime() + d * (bake.steps[stepIndex].unit === 'hours' ? 3600000 : 60000));
+                for (let i = stepIndex + 1; i < bake.steps.length; i++) {
+                    bake.steps[i].time = new Date(ct);
+                    bake.steps[i].notified = false;
+                    const sd = bake.steps[i].duration || 0;
+                    ct = new Date(ct.getTime() + sd * (bake.steps[i].unit === 'hours' ? 3600000 : 60000));
+                }
+                this.saveActiveBakes();
+                this.renderTimelineSteps(bake);
+                this.updateGlobalTimerBanner();
             },
 
             getCurrentStepIndex(bake) {
@@ -2222,14 +2425,24 @@
                     if (bake) { this.updatePerBakeTimerBanner(bake); return; }
                 }
                 document.getElementById('timerBanner').classList.remove('per-bake');
-                if (this.activeBakes.length === 0) { document.getElementById('timerBanner').classList.add('hidden'); return; }
+                // Hide on main screen — active bake cards already show timer/step info
+                if (this.currentScreen === 'main' || this.activeBakes.length === 0) { document.getElementById('timerBanner').classList.add('hidden'); return; }
 
                 let urgent = null, shortest = Infinity;
                 const now = new Date();
                 this.activeBakes.forEach(bake => {
-                    const cs = bake.steps[this.getCurrentStepIndex(bake)];
+                    const csi = this.getCurrentStepIndex(bake);
+                    const cs = bake.steps[csi];
                     if (!cs.completed) {
-                        const tr = cs.time - now;
+                        // Calculate actual remaining time (end of current step)
+                        const nsi = csi + 1;
+                        let endTime;
+                        if (nsi < bake.steps.length) {
+                            endTime = bake.steps[nsi].time.getTime();
+                        } else {
+                            endTime = cs.time.getTime() + cs.duration * (cs.unit === 'hours' ? 3600000 : 60000);
+                        }
+                        const tr = endTime - now.getTime();
                         if (tr < shortest) { shortest = tr; urgent = bake; }
                     }
                 });
@@ -2374,6 +2587,10 @@
 
             checkForNotifications() {
                 const now = new Date();
+                // Check starter feeding reminder
+                if (this.starterReminderTime && !this.starterReminderFired && now >= this.starterReminderTime) {
+                    this.sendStarterReminder();
+                }
                 this.activeBakes.forEach(bake => {
                     bake.steps.forEach((step, i) => {
                         if (step.completed || step.notified || !step.started || step.noNotification) return;
@@ -2410,13 +2627,19 @@
 
             playAlert() {
                 try {
-                    const ac = new (window.AudioContext || window.webkitAudioContext)();
-                    const o = ac.createOscillator(), g = ac.createGain();
-                    o.connect(g); g.connect(ac.destination);
-                    o.frequency.value = 800; o.type = 'sine';
-                    g.gain.setValueAtTime(0.3, ac.currentTime);
-                    g.gain.exponentialRampToValueAtTime(0.01, ac.currentTime + 0.5);
-                    o.start(ac.currentTime); o.stop(ac.currentTime + 0.5);
+                    if (!this.audioCtx) this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const ac = this.audioCtx;
+                    if (ac.state === 'suspended') ac.resume();
+                    const notes = [523, 659, 784]; // C5, E5, G5 ascending chime
+                    notes.forEach((freq, i) => {
+                        const o = ac.createOscillator(), g = ac.createGain();
+                        o.connect(g); g.connect(ac.destination);
+                        o.frequency.value = freq; o.type = 'sine';
+                        const t = ac.currentTime + i * 0.15;
+                        g.gain.setValueAtTime(0.25, t);
+                        g.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+                        o.start(t); o.stop(t + 0.4);
+                    });
                 } catch (e) {}
             },
 
@@ -2631,7 +2854,7 @@
                 html += '<h3 style="color:#fff;font-size:17px;font-weight:600;margin-bottom:10px">Steps</h3>';
                 (entry.steps || []).forEach(step => {
                     const dur = step.duration ? `${step.duration} ${step.unit || 'min'}` : '';
-                    html += `<div style="padding:6px 0;color:#EBEBF5;font-size:15px"><span style="color:#30D158;margin-right:6px">✓</span>${step.name}${dur ? ` — ${dur}` : ''}</div>`;
+                    html += `<div style="padding:6px 0;color:#EBEBF5;font-size:15px"><span style="color:#30D158;margin-right:6px">✓</span>${step.name}${dur ? ` — ${dur}` : ''}${step.stepNote ? `<div style="color:#8E8E93;font-size:13px;margin-top:2px;font-style:italic">${step.stepNote}</div>` : ''}</div>`;
                 });
                 html += '</div>';
 
@@ -2665,7 +2888,7 @@
                             id: bake.id,
                             recipeKey: bake.recipeKey,
                             recipeName: bake.recipeName,
-                            steps: bake.steps.map(s => ({ name: s.name, duration: s.duration, unit: s.unit, completed: s.completed })),
+                            steps: bake.steps.map(s => ({ name: s.name, duration: s.duration, unit: s.unit, completed: s.completed, stepNote: s.stepNote || '' })),
                             notes: bake.notes || [],
                             finishedAt: new Date().toISOString()
                         });
