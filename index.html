@@ -57,12 +57,49 @@
         /* ─── Active Bakes ─── */
         .active-bakes { margin-bottom: 24px; }
         .active-bakes h2, #timelineSteps h3 { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 12px; letter-spacing: -0.26px; }
-        .bake-card { background: #1C1C1E; padding: 16px; border-radius: 16px; margin-bottom: 10px; }
-        @media (min-width: 768px) { .bake-card { padding: 20px; display: flex; justify-content: space-between; align-items: center; } }
-        .bake-card-info h3 { color: #fff; margin-bottom: 4px; font-size: 17px; font-weight: 600; }
-        .bake-card-info p { color: #8E8E93; font-size: 13px; line-height: 1.4; }
-        .bake-card-actions { display: flex; gap: 8px; margin-top: 14px; }
-        @media (min-width: 768px) { .bake-card-actions { margin-top: 0; gap: 10px; } }
+        .bake-card { background: #1C1C1E; padding: 16px; border-radius: 16px; margin-bottom: 10px; cursor: pointer; transition: transform 0.15s; }
+        .bake-card:active { transform: scale(0.98); }
+        .bake-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .bake-card-header h3 { color: #fff; font-size: 17px; font-weight: 600; }
+        .bake-card-header .bake-card-actions { display: flex; gap: 8px; }
+        .bake-card-steps { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+        .bake-card-step { display: flex; justify-content: space-between; font-size: 14px; }
+        .bake-card-step .step-label { color: #8E8E93; }
+        .bake-card-step .step-value { color: #EBEBF5; font-weight: 500; }
+        .bake-card-step .step-value.ready { color: #FFD60A; }
+        .bake-card-progress { height: 4px; background: #2C2C2E; border-radius: 2px; overflow: hidden; }
+        .bake-card-progress-fill { height: 100%; background: #0A84FF; border-radius: 2px; transition: width 1s linear; }
+        .bake-card-progress-fill.done { background: #30D158; }
+
+        /* Hamburger menu */
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .menu-btn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; padding: 4px 8px; -webkit-tap-highlight-color: transparent; }
+        .menu-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.25s; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+        .menu-overlay.open { opacity: 1; pointer-events: auto; }
+        .menu-drawer { position: fixed; top: 0; left: 0; bottom: 0; width: 280px; background: #1C1C1E; z-index: 1000; transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.36, 0.66, 0.04, 1); padding: 60px 20px 20px; }
+        .menu-drawer.open { transform: translateX(0); }
+        .menu-drawer h2 { color: #fff; font-size: 28px; font-weight: 700; margin-bottom: 24px; }
+        .menu-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 0.5px solid rgba(60,60,67,0.36); color: #fff; font-size: 17px; cursor: pointer; transition: opacity 0.15s; }
+        .menu-item:active { opacity: 0.6; }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item-icon { width: 28px; text-align: center; display: inline-flex; align-items: center; justify-content: center; }
+        .menu-item-icon svg { width: 20px; height: 20px; stroke: #0A84FF; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* Timeline Preview */
+        .timeline-preview { margin-top: 20px; }
+        .timeline-preview h4 { color: #fff; font-size: 15px; font-weight: 600; margin-bottom: 10px; }
+        .tl-table { background: #1C1C1E; border-radius: 12px; padding: 12px; width: 100%; }
+        .tl-header-row { display: flex; gap: 4px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 0.5px solid rgba(60,60,67,0.36); }
+        .tl-header-row .tl-name-col { flex: 1; }
+        .tl-header-row .tl-time-col { width: 80px; text-align: right; font-size: 11px; font-weight: 600; color: #0A84FF; text-transform: uppercase; }
+        .tl-row { display: flex; gap: 4px; padding: 3px 0; font-size: 13px; }
+        .tl-row .tl-name-col { flex: 1; color: #EBEBF5; }
+        .tl-row .tl-time-col { width: 80px; text-align: right; color: #8E8E93; font-size: 12px; }
+        .tl-row.tl-branch-row .tl-name-col { color: #0A84FF; font-weight: 500; }
+        .tl-row.tl-only { background: rgba(10,132,255,0.08); border-radius: 6px; padding: 3px 4px; margin: 1px -4px; }
+        .tl-total-row { display: flex; gap: 4px; margin-top: 8px; padding-top: 8px; border-top: 0.5px solid rgba(60,60,67,0.36); font-size: 13px; }
+        .tl-total-row .tl-name-col { flex: 1; }
+        .tl-total-row .tl-time-col { width: 80px; text-align: right; color: #8E8E93; }
 
         /* ─── Recipe Book Card ─── */
         .recipe-book-card { background: #1C1C1E; border-radius: 16px; padding: 16px; margin-bottom: 24px; }
@@ -286,8 +323,29 @@
     </style>
 </head>
 <body>
+    <!-- Menu overlay and drawer -->
+    <div class="menu-overlay" id="menuOverlay" onclick="app.closeMenu()"></div>
+    <div class="menu-drawer" id="menuDrawer">
+        <h2>Recipe Sherpa</h2>
+        <div class="menu-item" onclick="app.closeMenu(); app.showMainScreen();">
+            <span class="menu-item-icon"><svg viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1m-2 0h2"/></svg></span> Home
+        </div>
+        <div class="menu-item" onclick="app.closeMenu(); app.showRecipeSelection();">
+            <span class="menu-item-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><circle cx="12" cy="9" r="2.5"/><path d="M9.5 9c0-1.5 1-3 2.5-3s2.5 1.5 2.5 3"/><path d="M10 6.5c-.7-.8-1.8-.8-2.2 0M14 6.5c.7-.8 1.8-.8 2.2 0"/></svg></span> Recipes
+        </div>
+        <div class="menu-item" onclick="app.closeMenu(); app.showHistoryScreen();">
+            <span class="menu-item-icon"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span> History
+        </div>
+    </div>
+
     <div class="container">
-        <h1>Recipe Sherpa</h1>
+        <div class="app-header">
+            <button class="menu-btn" onclick="app.toggleMenu()">
+                <svg width="22" height="18" viewBox="0 0 22 18" fill="none"><rect y="0" width="22" height="2" rx="1" fill="white"/><rect y="8" width="22" height="2" rx="1" fill="white"/><rect y="16" width="22" height="2" rx="1" fill="white"/></svg>
+            </button>
+            <h1 style="margin-bottom:0">Recipe Sherpa</h1>
+            <div style="width:38px"></div>
+        </div>
 
         <div id="timerBanner" class="timer-banner hidden" onclick="app.handleBannerClick()">
             <div class="banner-content">
@@ -357,7 +415,8 @@
                     <div class="hint">Choose where you are in the process</div>
                 </div>
                 <div id="recipeOptions" class="options-section"></div>
-                <button class="btn btn-success mt-20" style="width:100%" onclick="app.calculateTimeline()">Calculate Timeline</button>
+                <div id="timelinePreview"></div>
+                <button class="btn btn-success mt-20" style="width:100%" onclick="app.calculateTimeline()">Start Bake</button>
             </div>
         </div>
 
@@ -388,10 +447,19 @@
             <div id="recipeDetailContent"></div>
         </div>
 
+        <!-- History Full Screen -->
+        <div id="historyFullScreen" class="hidden">
+            <div class="screen-header">
+                <button class="back-btn" onclick="app.showMainScreen()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                <h2>Bake History</h2>
+            </div>
+            <div id="historyFullContent"></div>
+        </div>
+
         <!-- History Detail View -->
         <div id="historyDetailView" class="hidden">
             <div class="screen-header">
-                <button class="back-btn" onclick="app.showMainScreen()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                <button class="back-btn" onclick="app.showHistoryScreen()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
                 <h2 id="historyDetailName"></h2>
             </div>
             <div id="historyDetailContent"></div>
@@ -782,11 +850,12 @@
                         guidance: {
                             visual: ["Flip dough, pull bottom toward you and fold to center", "Repeat from sides and top to form a tight package", "Gently roll to create tension on the surface", "Place seam-side up in floured banneton"],
                             tips: ["Dust banneton with rice or AP flour to prevent sticking", "Tighter shaping = better oven spring"]
-                        }
+                        },
+                        postProofChoice: true
                     },
                     {
                         name: "Cold proof",
-                        duration: 12, unit: "hours",
+                        duration: 720, unit: "minutes", branch: "cold",
                         guidance: {
                             visual: ["Cover and place in fridge 8-72 hours"],
                             tips: ["Deepens flavor and makes scoring easier", "Don't wait too long — over-fermented dough won't rise", "You have flexibility on when to bake"]
@@ -1095,11 +1164,20 @@
             },
 
             hideAllScreens() {
-                ['mainScreen', 'recipeSelection', 'timelineSetup', 'timelineView', 'recipeDetailView', 'historyDetailView', 'addRecipeScreen'].forEach(id => {
+                ['mainScreen', 'recipeSelection', 'timelineSetup', 'timelineView', 'recipeDetailView', 'historyFullScreen', 'historyDetailView', 'addRecipeScreen'].forEach(id => {
                     const el = document.getElementById(id);
-                    el.classList.add('hidden');
-                    el.classList.remove('screen-enter');
+                    if (el) { el.classList.add('hidden'); el.classList.remove('screen-enter'); }
                 });
+            },
+
+            toggleMenu() {
+                document.getElementById('menuOverlay').classList.toggle('open');
+                document.getElementById('menuDrawer').classList.toggle('open');
+            },
+
+            closeMenu() {
+                document.getElementById('menuOverlay').classList.remove('open');
+                document.getElementById('menuDrawer').classList.remove('open');
             },
 
             showMainScreen() {
@@ -1110,6 +1188,47 @@
                 this.renderHistory();
                 this.updateGlobalTimerBanner();
                 this.currentScreen = 'main';
+            },
+
+            showHistoryScreen() {
+                this.hideAllScreens();
+                document.getElementById('historyFullScreen').classList.remove('hidden');
+                this.renderHistoryFull();
+                this.currentScreen = 'historyFullScreen';
+            },
+
+            renderHistoryFull() {
+                const container = document.getElementById('historyFullContent');
+                if (this.bakeHistory.length === 0) {
+                    container.innerHTML = '<div class="history-empty">No bakes completed yet</div>';
+                    return;
+                }
+                let html = '';
+                this.bakeHistory.slice().reverse().forEach(entry => {
+                    const date = new Date(entry.finishedAt);
+                    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    const noteCount = (entry.notes || []).length;
+                    const noteLabel = noteCount > 0 ? ` · ${noteCount} note${noteCount > 1 ? 's' : ''}` : '';
+                    html += `<div class="history-item" style="display:flex;align-items:center;justify-content:space-between">
+                        <div onclick="app.showHistoryDetail('${entry.id}')" style="flex:1;cursor:pointer">
+                            <h4>${entry.recipeName}</h4>
+                            <p>${dateStr}${noteLabel}</p>
+                        </div>
+                        <button class="btn btn-danger" style="font-size:13px;padding:6px 12px" onclick="app.deleteHistory('${entry.id}')">Delete</button>
+                    </div>`;
+                });
+                container.innerHTML = html;
+            },
+
+            deleteHistory(historyId) {
+                if (!confirm('Delete this bake from history?')) return;
+                this.bakeHistory = this.bakeHistory.filter(h => h.id !== historyId);
+                this.saveBakeHistory();
+                if (this.currentScreen === 'historyFullScreen') {
+                    this.renderHistoryFull();
+                } else {
+                    this.renderHistory();
+                }
             },
 
             showRecipeSelection() {
@@ -1135,6 +1254,12 @@
                 this.setDefaultStartTime();
                 this.updateGlobalTimerBanner();
                 this.currentScreen = 'timelineSetup';
+                // Hook inputs to update preview
+                const updatePreview = () => this.renderTimelinePreview();
+                document.getElementById('startTime').addEventListener('change', updatePreview);
+                document.getElementById('endTime').addEventListener('change', updatePreview);
+                document.getElementById('startingStep').addEventListener('change', updatePreview);
+                this.renderTimelinePreview();
             },
 
             showTimelineView(bakeId) {
@@ -1320,14 +1445,52 @@
                     container.innerHTML = '<div class="empty-state">No active bakes. Start a new one!</div>';
                     return;
                 }
+                const now = new Date();
                 container.innerHTML = this.activeBakes.map(bake => {
-                    const cs = this.getCurrentStep(bake);
-                    return `<div class="bake-card">
-                        <div class="bake-card-info"><h3>${bake.recipeName}</h3><p>Current: ${cs.name} • Started: ${this.fmtDT(new Date(bake.steps[0].time))}</p></div>
-                        <div class="bake-card-actions">
-                            <button class="btn" onclick="app.showTimelineView('${bake.id}')">Continue</button>
-                            <button class="btn btn-danger" onclick="app.finishBake('${bake.id}')">Finish</button>
+                    const csi = this.getCurrentStepIndex(bake);
+                    const cs = bake.steps[csi];
+                    const ns = csi + 1 < bake.steps.length ? bake.steps[csi + 1] : null;
+
+                    // Progress calculation
+                    let progressPct = 0, progressDone = false, timeStr = '';
+                    if (cs.completed) {
+                        progressPct = 0; progressDone = true; timeStr = 'Done';
+                    } else if (!cs.started) {
+                        progressPct = 100; timeStr = 'Not started';
+                    } else {
+                        const nsi = csi + 1;
+                        let endTime;
+                        if (nsi < bake.steps.length) {
+                            endTime = bake.steps[nsi].time.getTime();
+                        } else {
+                            endTime = cs.time.getTime() + cs.duration * (cs.unit === 'hours' ? 3600000 : 60000);
+                        }
+                        const tr = endTime - now.getTime();
+                        const tsd = endTime - cs.time.getTime();
+                        if (tr > 0 && tsd > 0) {
+                            progressPct = (tr / tsd) * 100;
+                            timeStr = this.fmtTR(tr);
+                        } else {
+                            progressPct = 0; progressDone = true; timeStr = 'Ready!';
+                        }
+                    }
+
+                    const csTimeStr = cs.started ? `Started ${this.fmtT(cs.time)}` : 'Not started';
+                    const nsStr = ns ? `${ns.name} — ${this.fmtT(ns.time)}` : 'Final step';
+                    const readyClass = timeStr === 'Ready!' ? ' ready' : '';
+
+                    return `<div class="bake-card" onclick="app.showTimelineView('${bake.id}')">
+                        <div class="bake-card-header">
+                            <h3>${bake.recipeName}</h3>
+                            <div class="bake-card-actions">
+                                <button class="btn btn-danger" onclick="event.stopPropagation(); app.finishBake('${bake.id}')">Finish</button>
+                            </div>
                         </div>
+                        <div class="bake-card-steps">
+                            <div class="bake-card-step"><span class="step-label">Current: ${cs.name}</span><span class="step-value${readyClass}">${timeStr}</span></div>
+                            <div class="bake-card-step"><span class="step-label">Next: ${nsStr}</span><span class="step-value">${csTimeStr}</span></div>
+                        </div>
+                        <div class="bake-card-progress"><div class="bake-card-progress-fill${progressDone ? ' done' : ''}" style="width:${Math.max(0,Math.min(100,progressPct))}%"></div></div>
                     </div>`;
                 }).join('');
                 this.updateGlobalTimerBanner();
@@ -1348,6 +1511,152 @@
                 document.querySelector(`.segmented-btn[data-mode="${mode}"]`).classList.add('active');
                 document.getElementById('startTimeGroup').classList.toggle('hidden', mode !== 'forward');
                 document.getElementById('endTimeGroup').classList.toggle('hidden', mode !== 'backward');
+                this.renderTimelinePreview();
+            },
+
+            renderTimelinePreview() {
+                const container = document.getElementById('timelinePreview');
+                if (!container) return;
+                const recipes = this.getRecipes();
+                const recipe = recipes[this.selectedRecipe];
+                if (!recipe) { container.innerHTML = ''; return; }
+
+                const startingStepIndex = parseInt(document.getElementById('startingStep').value) || 0;
+                let startTime;
+                if (this.mode === 'forward') {
+                    const v = document.getElementById('startTime').value;
+                    startTime = v ? new Date(v) : new Date();
+                } else {
+                    const v = document.getElementById('endTime').value;
+                    const endTime = v ? new Date(v) : new Date();
+                    const totalDuration = this.calcTotalDur(recipe, startingStepIndex);
+                    startTime = new Date(endTime - totalDuration);
+                }
+
+                const hasBranches = recipe.steps.some(s => s.branch === 'today') && recipe.steps.some(s => s.branch === 'cold' || s.postProofChoice);
+
+                // Build main steps (non-branch)
+                const buildTimeline = (branchChoice) => {
+                    const steps = [];
+                    let ct = new Date(startTime);
+                    const startingFromBranch = recipe.steps[startingStepIndex] && recipe.steps[startingStepIndex].branch;
+                    const startBranch = startingFromBranch ? recipe.steps[startingStepIndex].branch : null;
+
+                    // For cold path, reorder: shared → cold branch → today branch
+                    let orderedSteps = recipe.steps.map((s, i) => ({...s, _i: i}));
+                    if (branchChoice === 'cold' && !startingFromBranch) {
+                        const shared = orderedSteps.filter(s => !s.branch);
+                        const coldBranch = orderedSteps.filter(s => s.branch === 'cold');
+                        const todayBranch = orderedSteps.filter(s => s.branch === 'today');
+                        orderedSteps = [...shared, ...coldBranch, ...todayBranch];
+                    }
+
+                    orderedSteps.forEach((step) => {
+                        const index = step._i;
+                        if (startingFromBranch) {
+                            if (index < startingStepIndex) return;
+                            if (step.branch && step.branch !== startBranch && step.branch !== 'today') return;
+                            if (!step.branch) return;
+                        } else {
+                            if (index < startingStepIndex) return;
+                            if (step.branch) {
+                                if (branchChoice === 'today' && step.branch === 'cold') return;
+                                if (branchChoice === 'cold' && step.branch !== 'cold' && step.branch !== 'today') return;
+                                if (!branchChoice) return;
+                            }
+                        }
+
+                        let d;
+                        if (step.expandable && step.options) {
+                            d = step.options[0].sets * step.foldInterval;
+                        } else if (step.options) {
+                            d = step.options[0].duration || step.duration || 0;
+                        } else if (typeof step.duration === 'object') {
+                            d = (step.duration.min + step.duration.max) / 2;
+                        } else {
+                            d = step.duration || 0;
+                        }
+                        const u = step.unit || 'minutes';
+                        steps.push({ name: step.name, time: new Date(ct), duration: d, unit: u, branch: step.branch || null });
+                        ct = new Date(ct.getTime() + d * (u === 'hours' ? 3600000 : 60000));
+                    });
+                    return steps;
+                };
+
+                const fmtTime = (d) => d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                const fmtDay = (d) => {
+                    const today = new Date();
+                    const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+                    if (d.toDateString() === today.toDateString()) return '';
+                    if (d.toDateString() === tomorrow.toDateString()) return ' +1d';
+                    return ` (${d.toLocaleDateString('en-US', { weekday: 'short' })})`;
+                };
+
+                const getEndTime = (steps) => {
+                    if (steps.length === 0) return null;
+                    const last = steps[steps.length - 1];
+                    return new Date(last.time.getTime() + last.duration * (last.unit === 'hours' ? 3600000 : 60000));
+                };
+
+                let html = '<div class="timeline-preview"><h4>Timeline Preview</h4>';
+                if (hasBranches) {
+                    const todaySteps = buildTimeline('today');
+                    const coldSteps = buildTimeline('cold');
+
+                    // Merge into unified rows using two-pointer with re-convergence
+                    const allRows = [];
+                    let ti = 0, ci = 0;
+                    while (ti < todaySteps.length || ci < coldSteps.length) {
+                        const ts = ti < todaySteps.length ? todaySteps[ti] : null;
+                        const cs = ci < coldSteps.length ? coldSteps[ci] : null;
+                        if (ts && cs && ts.name === cs.name) {
+                            // Same step in both paths (shared or re-converged)
+                            allRows.push({ name: ts.name, today: ts.time, cold: cs.time });
+                            ti++; ci++;
+                        } else if (ts && (!cs || !coldSteps.slice(ci).find(s => s.name === ts.name))) {
+                            // Today-only step
+                            allRows.push({ name: ts.name, today: ts.time, cold: null, branch: ts.branch });
+                            ti++;
+                        } else if (cs && (!ts || !todaySteps.slice(ti).find(s => s.name === cs.name))) {
+                            // Cold-only step
+                            allRows.push({ name: cs.name, today: null, cold: cs.time, branch: cs.branch });
+                            ci++;
+                        } else if (cs) {
+                            // Cold step exists in today path later — emit cold-only first
+                            allRows.push({ name: cs.name, today: null, cold: cs.time, branch: cs.branch });
+                            ci++;
+                        } else {
+                            allRows.push({ name: ts.name, today: ts.time, cold: null, branch: ts.branch });
+                            ti++;
+                        }
+                    }
+
+                    html += '<div class="tl-table">';
+                    html += '<div class="tl-header-row"><div class="tl-name-col"></div><div class="tl-time-col">Same Day</div><div class="tl-time-col">Cold Proof</div></div>';
+                    allRows.forEach(row => {
+                        const branchClass = row.branch ? ' tl-branch-row' : '';
+                        const onlyClass = (row.today && !row.cold) || (!row.today && row.cold) ? ' tl-only' : '';
+                        const todayStr = row.today ? `${fmtTime(row.today)}${fmtDay(row.today)}` : '';
+                        const coldStr = row.cold ? `${fmtTime(row.cold)}${fmtDay(row.cold)}` : '';
+                        html += `<div class="tl-row${branchClass}${onlyClass}"><div class="tl-name-col">${row.name}</div><div class="tl-time-col">${todayStr}</div><div class="tl-time-col">${coldStr}</div></div>`;
+                    });
+                    const todayEnd = getEndTime(todaySteps);
+                    const coldEnd = getEndTime(coldSteps);
+                    html += `<div class="tl-total-row"><div class="tl-name-col">Done</div><div class="tl-time-col">${todayEnd ? '~' + fmtTime(todayEnd) + fmtDay(todayEnd) : ''}</div><div class="tl-time-col">${coldEnd ? '~' + fmtTime(coldEnd) + fmtDay(coldEnd) : ''}</div></div>`;
+                    html += '</div>';
+                } else {
+                    const steps = buildTimeline(null);
+                    html += '<div class="tl-table">';
+                    html += '<div class="tl-header-row"><div class="tl-name-col"></div><div class="tl-time-col">Time</div></div>';
+                    steps.forEach(s => {
+                        html += `<div class="tl-row"><div class="tl-name-col">${s.name}</div><div class="tl-time-col">${fmtTime(s.time)}${fmtDay(s.time)}</div></div>`;
+                    });
+                    const end = getEndTime(steps);
+                    if (end) html += `<div class="tl-total-row"><div class="tl-name-col">Done</div><div class="tl-time-col">~${fmtTime(end)}${fmtDay(end)}</div></div>`;
+                    html += '</div>';
+                }
+                html += '</div>';
+                container.innerHTML = html;
             },
 
             setDefaultStartTime() {
@@ -1564,9 +1873,11 @@
             },
 
             scaleIng(text, mult) {
-                return text.replace(/(\([^)]*\))|(\d+\.?\d*)/g, (match, paren, num) => {
+                return text.replace(/(\([^)]*\))|(\d+\.?\d*)(°[FC]|%|\s*(?:hours?|hrs?|minutes?|mins?|seconds?|secs?|days?|months?))?/gi, (match, paren, num, suffix) => {
                     if (paren) return paren;
                     if (num) {
+                        // Don't scale temperatures, percentages, or time durations
+                        if (suffix) return match;
                         const s = parseFloat(num) * mult;
                         return s % 1 === 0 ? s.toString() : parseFloat(s.toFixed(2)).toString();
                     }
@@ -1663,10 +1974,12 @@
                             <div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}',${index},'refrigerate')"><div class="choice-card-icon">❄️</div><div class="choice-card-text"><h4>Refrigerate</h4><p>Store 24-48 hours for more flavor</p></div></div>
                             <div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}',${index},'freeze')"><div class="choice-card-icon">🧊</div><div class="choice-card-text"><h4>Freeze</h4><p>Save for up to 2 months</p></div></div>
                         </div>`;
-                    } else if (bake.recipeKey === 'sourdough') {
+                    } else {
+                        // Generic: show today + cold proof options if recipe has those branches
+                        const hasCold = recipe && recipe.steps.some(s => s.branch === 'cold');
                         choiceHtml = `<div class="choice-cards">
-                            <div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}',${index},'today')"><div class="choice-card-icon">🔥</div><div class="choice-card-text"><h4>Room temp proof</h4><p>1-2.5 hours, proof until poke test passes</p></div></div>
-                            <div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}',${index},'cold')"><div class="choice-card-icon">❄️</div><div class="choice-card-text"><h4>Cold proof</h4><p>8-16 hours in fridge, better flavor + easier scoring</p></div></div>
+                            <div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}',${index},'today')"><div class="choice-card-icon">🔥</div><div class="choice-card-text"><h4>Bake today</h4><p>Continue to bake day steps</p></div></div>
+                            ${hasCold ? `<div class="choice-card" onclick="app.handlePostProofChoice('${bake.id}',${index},'cold')"><div class="choice-card-icon">❄️</div><div class="choice-card-text"><h4>Cold proof</h4><p>8-16 hours in fridge, better flavor + easier scoring</p></div></div>` : ''}
                         </div>`;
                     }
                 }
@@ -1764,32 +2077,7 @@
                 bake.steps = bake.steps.slice(0, stepIndex + 1);
                 const now = new Date();
 
-                if (bake.recipeKey === 'sourdough') {
-                    let currentTime = new Date(now);
-                    if (choice === 'cold') {
-                        // Add cold proof step
-                        const coldStep = recipe.steps.find(s => s.branch === 'cold');
-                        bake.steps.push({
-                            name: coldStep.name, time: new Date(currentTime),
-                            duration: coldStep.duration, unit: coldStep.unit,
-                            guidance: coldStep.guidance, completed: false,
-                            branch: 'cold', stepIndex: recipe.steps.indexOf(coldStep)
-                        });
-                        currentTime = new Date(currentTime.getTime() + coldStep.duration * 60000);
-                    }
-                    // Add baking steps
-                    recipe.steps.filter(s => s.branch === 'today').forEach(step => {
-                        const d = typeof step.duration === 'object' ? (step.duration.min + step.duration.max) / 2 : (step.duration || 0);
-                        const u = (typeof step.duration === 'object' ? step.duration.unit : step.unit) || 'minutes';
-                        bake.steps.push({
-                            name: step.name, time: new Date(currentTime),
-                            duration: d, unit: u, guidance: step.guidance,
-                            completed: false, branch: 'today',
-                            stepIndex: recipe.steps.indexOf(step)
-                        });
-                        currentTime = new Date(currentTime.getTime() + d * (u === 'hours' ? 3600000 : 60000));
-                    });
-                } else if (bake.recipeKey === 'pizza') {
+                if (bake.recipeKey === 'pizza') {
                     let currentTime = new Date(now);
                     if (choice === 'today') {
                         recipe.steps.filter(s => s.branch === 'today').forEach(step => {
@@ -1821,6 +2109,33 @@
                             ct = new Date(ct.getTime() + d * (step.unit === 'hours' ? 3600000 : 60000));
                         });
                     }
+                } else {
+                    // Generic handler for sourdough, chocoEspresso, pretzelBread, etc.
+                    let currentTime = new Date(now);
+                    if (choice === 'cold') {
+                        const coldStep = recipe.steps.find(s => s.branch === 'cold');
+                        if (coldStep) {
+                            bake.steps.push({
+                                name: coldStep.name, time: new Date(currentTime),
+                                duration: coldStep.duration, unit: coldStep.unit,
+                                guidance: coldStep.guidance, completed: false,
+                                branch: 'cold', stepIndex: recipe.steps.indexOf(coldStep)
+                            });
+                            currentTime = new Date(currentTime.getTime() + coldStep.duration * (coldStep.unit === 'hours' ? 3600000 : 60000));
+                        }
+                    }
+                    // Add baking day steps
+                    recipe.steps.filter(s => s.branch === 'today').forEach(step => {
+                        const d = typeof step.duration === 'object' ? (step.duration.min + step.duration.max) / 2 : (step.duration || 0);
+                        const u = (typeof step.duration === 'object' ? step.duration.unit : step.unit) || 'minutes';
+                        bake.steps.push({
+                            name: step.name, time: new Date(currentTime),
+                            duration: d, unit: u, guidance: step.guidance,
+                            completed: false, branch: 'today',
+                            stepIndex: recipe.steps.indexOf(step)
+                        });
+                        currentTime = new Date(currentTime.getTime() + d * (u === 'hours' ? 3600000 : 60000));
+                    });
                 }
 
                 this.saveActiveBakes();
@@ -2051,46 +2366,10 @@
                 this.timerInterval = setInterval(() => {
                     this.updateGlobalTimerBanner();
                     this.checkForNotifications();
-                    this.updateLiveNotification();
-                }, 1000);
-            },
-
-            updateLiveNotification() {
-                if (!('Notification' in window) || Notification.permission !== 'granted') return;
-                if (this.activeBakes.length === 0) return;
-                // Find most urgent active step with a running timer
-                let urgentBake = null, urgentStep = null, urgentIdx = -1, shortest = Infinity;
-                const now = new Date();
-                this.activeBakes.forEach(bake => {
-                    const csi = this.getCurrentStepIndex(bake);
-                    const cs = bake.steps[csi];
-                    if (cs && !cs.completed && cs.started && !cs.noTimer) {
-                        const nsi = csi + 1;
-                        let endTime;
-                        if (nsi < bake.steps.length) {
-                            endTime = bake.steps[nsi].time.getTime();
-                        } else {
-                            endTime = cs.time.getTime() + cs.duration * (cs.unit === 'hours' ? 3600000 : 60000);
-                        }
-                        const tr = endTime - now.getTime();
-                        if (tr > 0 && tr < shortest) {
-                            shortest = tr; urgentBake = bake; urgentStep = cs; urgentIdx = csi;
-                        }
+                    if (this.currentScreen === 'main' && this.activeBakes.length > 0) {
+                        this.renderActiveBakes();
                     }
-                });
-                if (!urgentBake || shortest <= 0) return;
-                // Only update every 15 seconds to avoid excessive notifications
-                if (!this._lastLiveNotif || now.getTime() - this._lastLiveNotif > 15000) {
-                    this._lastLiveNotif = now.getTime();
-                    try {
-                        new Notification(`${urgentBake.recipeName} — ${urgentStep.name}`, {
-                            body: `${this.fmtTR(shortest)} remaining`,
-                            tag: 'rs-live-timer',
-                            silent: true,
-                            renotify: true
-                        });
-                    } catch (e) {}
-                }
+                }, 1000);
             },
 
             checkForNotifications() {
@@ -2338,9 +2617,7 @@
                 const entry = this.bakeHistory.find(h => h.id === historyId);
                 if (!entry) return;
 
-                ['mainScreen', 'recipeSelection', 'timelineSetup', 'timelineView', 'recipeDetailView', 'historyDetailView', 'addRecipeScreen'].forEach(id => {
-                    document.getElementById(id).classList.add('hidden');
-                });
+                this.hideAllScreens();
                 document.getElementById('historyDetailView').classList.remove('hidden');
                 document.getElementById('historyDetailName').textContent = entry.recipeName;
                 this.currentScreen = 'historyDetailView';
